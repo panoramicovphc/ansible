@@ -1,22 +1,51 @@
-name: Publish Ansible project
-run-name: ${{ github.actor }} is deploying at (${{ github.run_number }})
+name: Setup and Run Terraform
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  run-ansible-playbook:
-    runs-on: self-hosted
+  setup-and-run-terraform:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Run Ansible Playbook
-        env:
-          MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
-          MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
-        run: ansible-playbook ./playbooks/pull-repo.yml -i ./inventory/hosts.ini -e MKADMIN_LOGIN=$MKADMIN_LOGIN -e MKADMIN_PASSWORD=$MKADMIN_PASSWORD
+    - name: Set up Terraform
+      run: |
+        # Determine OS and Architecture
+        OS=$(uname | tr '[:upper:]' '[:lower:]')
+        ARCH=$(uname -m)
+        
+        if [ "$ARCH" == "x86_64" ]; then
+          ARCH="amd64"
+        elif [[ "$ARCH" == "arm*" ]]; then
+          ARCH="arm"
+        fi
+        
+        # Set paths based on OS
+        if [[ "$OS" == "linux" ]]; then
+          INSTALL_PATH="/opt/terraform"
+          PROJECT_PATH="/usr/local/terraform"
+        elif [[ "$OS" == "darwin" ]]; then
+          INSTALL_PATH="/opt/terraform"
+          PROJECT_PATH="/usr/local/terraform"
+        elif [[ "$OS" == "mingw"* ]] || [[ "$OS" == "cygwin"* ]]; then
+          INSTALL_PATH="D:/opt/terraform"
+          PROJECT_PATH="D:/usr/local/terraform"
+        else
+          echo "OS not supported"
+          exit 1
+        fi
+
+        # Download and install Terraform
+        if [ ! -f "$INSTALL_PATH/terraform" ]; then
+          echo "Terraform not found. Downloading..."
+          mkdir -p $INSTALL_PATH
+          wget https://releases.hashicorp.com/terraform/$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r .current_version)/terraform_$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r .current_version)_${OS}_${ARCH}.zip
+          unzip terraform_*_${OS}_${ARCH}.zip -d $INSTALL_PATH
+          rm terraform_*_${OS}_${ARCH}.zip
+          echo "Terraform downloaded and extracted to $INSTALL_PATH"
+        else
+          echo "Terraform already exists in $INSTALL_PATH"
+        fi
+        sudo ln -sf $INSTALL_PATH/terraform /usr/local/bin/terraform
