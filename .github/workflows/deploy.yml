@@ -17,7 +17,6 @@ jobs:
         run: echo "OS=$(uname | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Check architecture
-        id: check_architecture
         run: |
           ARCH=$(uname -m)
           if [ "$ARCH" == "x86_64" ]; then
@@ -26,6 +25,9 @@ jobs:
             echo "ARCH=arm" >> $GITHUB_ENV
           else
             echo "ARCH=$ARCH" >> $GITHUB_ENV
+          
+          # Ensure the script ends properly
+          echo "Architecture check completed."
 
       - name: Set paths based on platform
         id: set_paths
