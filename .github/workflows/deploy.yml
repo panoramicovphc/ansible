@@ -1,5 +1,5 @@
 name: Publish Ansible project
-run-name: ${{ github.actor }} is deploying (${{ github.run_number }})
+run-name: ${{ github.actor }} is deploying at ${{ runner.name }} (${{ github.run_number }})
 
 on:
   push:
