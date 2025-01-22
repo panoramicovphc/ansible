@@ -13,25 +13,28 @@ jobs:
 
     steps:
       - name: Set up Terraform
+        env:
+          MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
+          MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
         run: |
           # Determine OS and Architecture
           OS=$(uname | tr '[:upper:]' '[:lower:]')
           ARCH=$(uname -m)
           
-          if [ "$ARCH" == "x86_64" ]; then
+          if [ "$ARCH" == "x86_64" ]; então
             ARCH="amd64"
-          elif [[ "$ARCH" == "arm"* ]]; then
+          elif [[ "$ARCH" == "arm"* ]]; então
             ARCH="arm"
           fi
           
           # Set paths based on OS
-          if [[ "$OS" == "linux" ]]; then
-            INSTALL_PATH="$HOME/terraform"
-            PROJECT_PATH="$HOME/terraform_project"
-          elif [[ "$OS" == "darwin" ]]; then
-            INSTALL_PATH="$HOME/terraform"
-            PROJECT_PATH="$HOME/terraform_project"
-          elif [[ "$OS" == "mingw"* ]] || [[ "$OS" == "cygwin"* ]]; then
+          if [[ "$OS" == "linux" ]]; então
+            INSTALL_PATH="/opt/terraform"
+            PROJECT_PATH="/usr/local/terraform"
+          elif [[ "$OS" == "darwin" ]]; então
+            INSTALL_PATH="/opt/terraform"
+            PROJECT_PATH="/usr/local/terraform"
+          elif [[ "$OS" == "mingw"* ]] || [[ "$OS" == "cygwin"* ]]; então
             INSTALL_PATH="D:/opt/terraform"
             PROJECT_PATH="D:/usr/local/terraform"
           else
@@ -40,15 +43,15 @@ jobs:
           fi
   
           # Download and install Terraform
-          if [ ! -f "$INSTALL_PATH/terraform" ]; then
+          if [ ! -f "$INSTALL_PATH/terraform" ]; então
             echo "Terraform not found. Downloading..."
-            mkdir -p $INSTALL_PATH
+            echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "mkdir -p $INSTALL_PATH" ${{ secrets.MKADMIN_LOGIN }}
             LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r .current_version)
             wget https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_${OS}_${ARCH}.zip
-            unzip terraform_${LATEST_VERSION}_${OS}_${ARCH}.zip -d $INSTALL_PATH
+            echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "unzip terraform_${LATEST_VERSION}_${OS}_${ARCH}.zip -d $INSTALL_PATH" ${{ secrets.MKADMIN_LOGIN }}
             rm terraform_${LATEST_VERSION}_${OS}_${ARCH}.zip
             echo "Terraform downloaded and extracted to $INSTALL_PATH"
           else
             echo "Terraform already exists in $INSTALL_PATH"
           fi
-          sudo ln -sf $INSTALL_PATH/terraform /usr/local/bin/terraform
+          echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "ln -sf $INSTALL_PATH/terraform /usr/local/bin/terraform" ${{ secrets.MKADMIN_LOGIN }}
