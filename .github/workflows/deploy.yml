@@ -1,5 +1,5 @@
 name: Publish Ansible project
-run-name: /#${{ github.run_number }} @ ${{ github.actor }}
+run-name: ${{ github.actor }} is deoploying (${{ github.run_number }})
 
 on:
   push:
