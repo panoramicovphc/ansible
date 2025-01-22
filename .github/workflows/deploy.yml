@@ -12,34 +12,39 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Set up Terraform
-        env:
-          MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
-          MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
-        run: |
-          OS=$(uname | tr '[:upper:]' '[:lower:]')
-          ARCH=$(uname -m)
-          
-          if [ "$ARCH" == "x86_64" ]; then
-            ARCH="amd64"
-          elif [[ "$ARCH" == "arm"* ]]; then
-            ARCH="arm"
-          fi
+      - name: Check platform
+        id: check_platform
+        run: echo "OS=$(uname | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Check architecture
+        id: check_architecture
+        run: |
+          ARCH=$(uname -m)
+          if [ "$ARCH" == "x86_64" ]; then
+            echo "ARCH=amd64" >> $GITHUB_ENV
+          elif [[ "$ARCH" == "arm"* ]]; then
+            echo "ARCH=arm" >> $GITHUB_ENV
+          else
+            echo "ARCH=$ARCH" >> $GITHUB_ENV
+
+      - name: Set paths based on platform
+        id: set_paths
+        run: |
           if [[ "$OS" == "linux" ]]; then
-            INSTALL_PATH="/opt/terraform"
-            PROJECT_PATH="/usr/local/terraform"
+            echo "INSTALL_PATH=/opt/terraform" >> $GITHUB_ENV
+            echo "PROJECT_PATH=/usr/local/terraform" >> $GITHUB_ENV
           elif [[ "$OS" == "darwin" ]]; then
-            INSTALL_PATH="/opt/terraform"
-            PROJECT_PATH="/usr/local/terraform"
+            echo "INSTALL_PATH=/opt/terraform" >> $GITHUB_ENV
+            echo "PROJECT_PATH=/usr/local/terraform" >> $GITHUB_ENV
           elif [[ "$OS" == "mingw"* ]] || [[ "$OS" == "cygwin"* ]]; then
-            INSTALL_PATH="D:/opt/terraform"
-            PROJECT_PATH="D:/usr/local/terraform"
+            echo "INSTALL_PATH=D:/opt/terraform" >> $GITHUB_ENV
+            echo "PROJECT_PATH=D:/usr/local/terraform" >> $GITHUB_ENV
           else
             echo "OS not supported"
             exit 1
-          fi
 
+      - name: Ensure directory exists
+        run: |
           if [ ! -f "$INSTALL_PATH/terraform" ]; then
             echo "Terraform not found. Downloading..."
             echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "mkdir -p $INSTALL_PATH" ${{ secrets.MKADMIN_LOGIN }}
@@ -50,5 +55,6 @@ jobs:
             echo "Terraform downloaded and extracted to $INSTALL_PATH"
           else
             echo "Terraform already exists in $INSTALL_PATH"
-          fi
-          echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "ln -sf $INSTALL_PATH/terraform /usr/local/bin/terraform" ${{ secrets.MKADMIN_LOGIN }}
+
+      - name: Create symlink
+        run: echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "ln -sf $INSTALL_PATH/terraform /usr/local/bin/terraform" ${{ secrets.MKADMIN_LOGIN }}
