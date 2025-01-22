@@ -15,10 +15,5 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Ansible using apt-get
-        run: |
-          apt-get update
-          apt-get install -y ansible
-
       - name: Run Ansible Playbook
         run: ansible-playbook pull-repo.yml
