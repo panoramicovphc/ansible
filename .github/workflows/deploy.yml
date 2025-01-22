@@ -17,33 +17,30 @@ jobs:
           MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
           MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
         run: |
-          # Determine OS and Architecture
           OS=$(uname | tr '[:upper:]' '[:lower:]')
           ARCH=$(uname -m)
           
-          if [ "$ARCH" == "x86_64" ]; então
+          if [ "$ARCH" == "x86_64" ]; then
             ARCH="amd64"
-          elif [[ "$ARCH" == "arm"* ]]; então
+          elif [[ "$ARCH" == "arm"* ]]; then
             ARCH="arm"
           fi
-          
-          # Set paths based on OS
-          if [[ "$OS" == "linux" ]]; então
+
+          if [[ "$OS" == "linux" ]]; then
             INSTALL_PATH="/opt/terraform"
             PROJECT_PATH="/usr/local/terraform"
-          elif [[ "$OS" == "darwin" ]]; então
+          elif [[ "$OS" == "darwin" ]]; then
             INSTALL_PATH="/opt/terraform"
             PROJECT_PATH="/usr/local/terraform"
-          elif [[ "$OS" == "mingw"* ]] || [[ "$OS" == "cygwin"* ]]; então
+          elif [[ "$OS" == "mingw"* ]] || [[ "$OS" == "cygwin"* ]]; then
             INSTALL_PATH="D:/opt/terraform"
             PROJECT_PATH="D:/usr/local/terraform"
           else
             echo "OS not supported"
             exit 1
           fi
-  
-          # Download and install Terraform
-          if [ ! -f "$INSTALL_PATH/terraform" ]; então
+
+          if [ ! -f "$INSTALL_PATH/terraform" ]; then
             echo "Terraform not found. Downloading..."
             echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "mkdir -p $INSTALL_PATH" ${{ secrets.MKADMIN_LOGIN }}
             LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r .current_version)
