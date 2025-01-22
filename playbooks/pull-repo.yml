@@ -1,0 +1,56 @@
+---
+- name: Atualiza o projeto ansible
+  hosts: all
+  become: true
+  vars:
+    repo_url: "https://github.com/MK-House/ansible"
+    branch: "main"
+  tasks:
+    - name: Definir o diretório de destino baseado no SO
+      set_fact:
+        dest_dir: "{{ 'D:/usr/local/ansible' if ansible_os_family == 'Windows' else '/usr/local/ansible' }}"
+
+    - name: Limpar o conteúdo do diretório de destino no Linux
+      when: ansible_os_family != 'Windows'
+      block:
+        - name: Remover arquivos e subdiretórios dentro do diretório de destino
+          file:
+            path: "{{ dest_dir }}"
+            state: absent
+            recurse: yes
+          ignore_errors: true
+
+        - name: Criar o diretório de destino se não existir
+          file:
+            path: "{{ dest_dir }}"
+            state: directory
+
+    - name: Limpar o conteúdo do diretório de destino no Windows
+      when: ansible_os_family == 'Windows'
+      block:
+        - name: Remover arquivos e subdiretórios dentro do diretório de destino
+          win_file:
+            path: "{{ dest_dir }}"
+            state: absent
+            recurse: yes
+          ignore_errors: true
+
+        - name: Criar o diretório de destino se não existir
+          win_file:
+            path: "{{ dest_dir }}"
+            state: directory
+
+    - name: Clonar ou atualizar o repositório Git no Linux
+      when: ansible_os_family != 'Windows'
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ dest_dir }}"
+        version: "{{ branch }}"
+        force: yes
+        update: yes
+
+    - name: Clonar ou atualizar o repositório Git no Windows
+      when: ansible_os_family == 'Windows'
+      win_command: git clone -b {{ branch }} --single-branch {{ repo_url }} {{ dest_dir }}
+      args:
+        creates: "{{ dest_dir }}"
