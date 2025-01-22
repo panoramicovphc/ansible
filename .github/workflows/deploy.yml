@@ -1,10 +1,15 @@
-name: Setup and Run Terraform
+name: Publish Ansible project
+run-name: ${{ github.actor }} is deploying run ${{ github.run_number }}
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   setup-and-run-terraform:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout repository
