@@ -1,5 +1,5 @@
 name: Publish Ansible project
-run-name: ${{ github.actor }}/${{ github.workflow }}@${{ github.run_number }}
+run-name: ${{ github.actor }}/${{ github.action }}@${{ github.run_number }}
 
 on:
   push:
@@ -17,8 +17,8 @@ jobs:
 
       - name: Install Ansible using apt-get
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ansible
+          apt-get update
+          apt-get install -y ansible
 
       - name: Run Ansible Playbook
         run: ansible-playbook pull-repo.yml
