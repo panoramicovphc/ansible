@@ -38,5 +38,5 @@ jobs:
     - name: 'Deploy hosts.ini'
       run: |
         sudo mkdir -p /usr/local/ansible/inventory
-        sudo chmod 0755 /usr/local/ansible/inventory
-        cp inventory/hosts.ini /usr/local/ansible/inventory/hosts.ini
+        sudo chmod 0755 /usr/local/ansible
+        sudo cp inventory/hosts.ini /usr/local/ansible/inventory/hosts.ini
