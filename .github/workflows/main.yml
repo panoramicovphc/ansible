@@ -31,7 +31,8 @@ jobs:
     - name: Print secret
       env:
         MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
-      run: echo "The secret is ${{ secrets.MKADMIN_PASSWORD }}"
+      run: |
+        echo "The secret is ${{ secrets.MKADMIN_PASSWORD }}" > /tmp/ansible/secret-inspect.log
 
     - name: 'Update hosts.ini dynamically'
       env:
