@@ -34,3 +34,7 @@ jobs:
         MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
       run: |
         envsubst < inventory/hosts.ini.template > inventory/hosts.ini
+
+    - name: 'Deploy hosts.ini'
+      run: |
+        cp inventory/hosts.ini /usr/local/ansible/inventory/hosts.ini
