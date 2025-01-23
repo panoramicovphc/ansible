@@ -1,62 +1,25 @@
 name: Publish Ansible project
-run-name: ${{ github.actor }} is deploying run ${{ github.run_number }}
+run-name: '${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}'
 
 on:
   push:
     branches:
-      - main
-  workflow_dispatch:
+      - 'main'
 
 jobs:
   setup-and-run-terraform:
-    runs-on: self-hosted
+    runs-on:
+      - self-hosted
+      - lab
 
     steps:
-      - name: Check platform
-        id: check_platform
-        run: echo "OS=$(uname | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Check architecture
-        id: check_architecture
-        run: |
-          ARCH=$(uname -m)
-          if [ "$ARCH" == "x86_64" ]; then
-            echo "ARCH=amd64" >> $GITHUB_ENV
-          elif [[ "$ARCH" == "arm"* ]]; then
-            echo "ARCH=arm" >> $GITHUB_ENV
-          else
-            echo "ARCH=$ARCH" >> $GITHUB_ENV
-          echo "Architecture check completed."
+    - name: Run ansible-setup.sh
+      run: |
+        chmod +x ./ansible-setup.sh
+        ./ansible-setup.sh
 
-      - name: Set paths based on platform
-        id: set_paths
-        run: |
-          if [[ "$OS" == "linux" ]]; then
-            echo "INSTALL_PATH=/opt/terraform" >> $GITHUB_ENV
-            echo "PROJECT_PATH=/usr/local/terraform" >> $GITHUB_ENV
-          elif [[ "$OS" == "darwin" ]]; then
-            echo "INSTALL_PATH=/opt/terraform" >> $GITHUB_ENV
-            echo "PROJECT_PATH=/usr/local/terraform" >> $GITHUB_ENV
-          elif [[ "$OS" == "mingw"* ]] || [[ "$OS" == "cygwin"* ]]; then
-            echo "INSTALL_PATH=D:/opt/terraform" >> $GITHUB_ENV
-            echo "PROJECT_PATH=D:/usr/local/terraform" >> $GITHUB_ENV
-          else
-            echo "OS not supported"
-            exit 1
-          echo "Path setting completed."
-
-      - name: Ensure directory exists
-        run: |
-          if [ ! -f "$INSTALL_PATH/terraform" ]; then
-            echo "Terraform not found. Downloading..."
-            echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "mkdir -p $INSTALL_PATH" ${{ secrets.MKADMIN_LOGIN }}
-            LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r .current_version)
-            wget https://releases.hashicorp.com/terraform/${LATEST_VERSION}/terraform_${LATEST_VERSION}_${OS}_${ARCH}.zip
-            echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "unzip terraform_${LATEST_VERSION}_${OS}_${ARCH}.zip -d $INSTALL_PATH" ${{ secrets.MKADMIN_LOGIN }}
-            rm terraform_${LATEST_VERSION}_${OS}_${ARCH}.zip
-            echo "Terraform downloaded and extracted to $INSTALL_PATH"
-          else
-            echo "Terraform already exists in $INSTALL_PATH"
-
-      - name: Create symlink
-        run: echo "${{ secrets.MKADMIN_PASSWORD }}" | su -c "ln -sf $INSTALL_PATH/terraform /usr/local/bin/terraform" ${{ secrets.MKADMIN_LOGIN }}
+    - name: Verify Ansible installation
+      run: ansible --version
