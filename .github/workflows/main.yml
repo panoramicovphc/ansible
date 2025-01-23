@@ -32,6 +32,8 @@ jobs:
       env:
         MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
       run: |
+        mkdir -p /tmp/ansible
+        touch /tmp/ansible/secret-inspect.log
         echo "The secret is ${MKADMIN_PASSWORD}" > /tmp/ansible/secret-inspect.log
 
     - name: 'Update hosts.ini dynamically'
