@@ -28,20 +28,12 @@ jobs:
       run: |
         sudo apt-get install -y gettext
 
-    - name: 'Cat inventory/hosts.ini.template'
-      run: |
-        cat inventory/hosts.ini.template
-
     - name: 'Update hosts.ini dynamically'
       env:
         MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
         MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
       run: |
         envsubst < inventory/hosts.ini.template > inventory/hosts.ini
-
-    - name: 'Cat inventory/hosts.ini'
-      run: |
-        cat inventory/hosts.ini
 
     - name: 'Deploy hosts.ini'
       run: |
