@@ -37,4 +37,5 @@ jobs:
 
     - name: 'Deploy hosts.ini'
       run: |
+        mkdir -p /usr/local/ansible/inventory
         cp inventory/hosts.ini /usr/local/ansible/inventory/hosts.ini
