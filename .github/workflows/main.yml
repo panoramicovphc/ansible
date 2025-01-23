@@ -28,6 +28,11 @@ jobs:
       run: |
         sudo apt-get install -y gettext
 
+    - name: Print secret
+      env:
+        MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
+      run: echo "The secret is ${{ secrets.MKADMIN_PASSWORD }}"
+
     - name: 'Update hosts.ini dynamically'
       env:
         MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
