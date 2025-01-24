@@ -32,6 +32,9 @@ jobs:
 
     steps:
 
+    - name: 'Checkout repository'
+      uses: 'actions/checkout@v2'
+
     - name: 'Install gettext (envsubst)'
       run: |
         sudo apt-get install -y gettext
@@ -44,7 +47,7 @@ jobs:
         envsubst < inventory/hosts.ini.template > inventory/hosts.ini
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: inventory/hosts
         path: inventory/hosts.ini
@@ -70,7 +73,7 @@ jobs:
         ansible --version
 
     - name: Download artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
         name: inventory/hosts.ini
         path: ./inventory
