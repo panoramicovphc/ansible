@@ -1,2 +1,7 @@
-[vm-lab]
-devbian.mkh  ansible_user=${MKADMIN_LOGIN} ansible_password=${MKADMIN_PASSWORD}
+[prd]
+tankian.mkh    ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}
+trujillo.mkh   ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}
+chuck.mkh      ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}
+
+[lab]
+devbian.mkh    ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}
