@@ -11,17 +11,13 @@ jobs:
   setup-ansible-runtime:
     runs-on:
       - 'self-hosted'
-
     steps:
-
     - name: 'Checkout repository'
       uses: 'actions/checkout@v2'
-
     - name: 'Run ansible-setup.sh'
       run: |
         chmod +x ./ansible-setup.sh
         ./ansible-setup.sh
-
     - name: 'Verify Ansible installation'
       run: |
         ansible --version
@@ -29,55 +25,45 @@ jobs:
   prepare-ansible-inventory:
     runs-on:
       - 'ubuntu-latest'
-
     steps:
-
     - name: 'Checkout repository'
       uses: 'actions/checkout@v2'
-
     - name: 'Install gettext (envsubst)'
       run: |
         sudo apt-get install -y gettext
-
     - name: 'Update hosts.ini dynamically'
       env:
         MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
         MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
       run: |
         envsubst < inventory/hosts.ini.template > inventory/hosts.ini
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
+    - name: 'Upload artifact'
+      uses: 'actions/upload-artifact@v4'
       with:
-        name: inventory/hosts
-        path: inventory/hosts.ini
+        name: 'hosts'
+        path: 'inventory/hosts.ini'
 
   propagate-ansible-project:
     needs:
-      - setup-ansible-runtime
-      - prepare-ansible-inventory
+      - 'setup-ansible-runtime'
+      - 'prepare-ansible-inventory'
     runs-on:
       - 'self-hosted'
-
     steps:
     - name: 'Checkout repository'
       uses: 'actions/checkout@v2'
-
     - name: 'Run ansible-setup.sh'
       run: |
         chmod +x ./ansible-setup.sh
         ./ansible-setup.sh
-
     - name: 'Verify Ansible installation'
       run: |
         ansible --version
-
-    - name: Download artifact
-      uses: actions/download-artifact@v4
+    - name: 'Download artifact'
+      uses: 'actions/download-artifact@v4'
       with:
-        name: inventory/hosts.ini
-        path: ./inventory
-
+        name: 'hosts'
+        path: './inventory'
     - name: 'Deploy hosts.ini'
       run: |
         sudo mkdir -p /usr/local/ansible/inventory
