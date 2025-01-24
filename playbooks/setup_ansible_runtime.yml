@@ -11,8 +11,6 @@
 
     - name: Execute the ansible-setup.sh script
       command: /usr/local/ansible/ansible-setup.sh
-      args:
-        creates: /tmp/ansible-setup.log
       register: setup_script_output
 
     - name: Print the output of the setup script
