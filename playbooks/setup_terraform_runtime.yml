@@ -3,6 +3,18 @@
   hosts: all
   become: true
   tasks:
+    - name: Ensure zip is installed
+      apt:
+        name: zip
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure zip is installed
+      yum:
+        name: zip
+        state: present
+      when: ansible_os_family == "RedHat"
+
     - name: Get the latest release info
       uri:
         url: "https://api.github.com/repos/{{ github_user }}/{{ github_repo }}/releases/latest"
