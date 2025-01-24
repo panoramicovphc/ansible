@@ -32,25 +32,6 @@ jobs:
         MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
       run: |
         envsubst < inventory/hosts.ini.template > inventory/hosts.ini
-    - name: 'Upload artifact'
-      uses: 'actions/upload-artifact@v4'
-      with:
-        name: 'hosts'
-        path: 'inventory/hosts.ini'
-    - name: 'Checkout repository'
-      uses: 'actions/checkout@v2'
-    - name: 'Run ansible-setup.sh'
-      run: |
-        chmod +x ./ansible-setup.sh
-        ./ansible-setup.sh
-    - name: 'Verify Ansible installation'
-      run: |
-        ansible --version
-    - name: 'Download artifact'
-      uses: 'actions/download-artifact@v4'
-      with:
-        name: 'hosts'
-        path: './inventory'
     - name: 'Deploy hosts.ini'
       run: |
         sudo mkdir -p /usr/local/ansible/inventory
