@@ -6,6 +6,9 @@ else
     LOG_FILE="$1"
 fi
 
+# Excluir o arquivo de log antes de começar o processo
+rm -f $LOG_FILE
+
 : > $LOG_FILE
 exec > >(tee -i $LOG_FILE)
 exec 2>&1
