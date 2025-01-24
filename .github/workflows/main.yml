@@ -11,27 +11,35 @@ jobs:
   deploy-ansible-project:
     runs-on:
       - 'self-hosted'
+
     steps:
+
     - name: 'Checkout repository'
       uses: 'actions/checkout@v2'
+
     - name: 'Run ansible-setup.sh'
       run: |
         chmod +x ./ansible-setup.sh
         ./ansible-setup.sh
+
     - name: 'Verify Ansible installation'
       run: |
         ansible --version
+
     - name: 'Checkout repository'
       uses: 'actions/checkout@v2'
+
     - name: 'Install gettext (envsubst)'
       run: |
         sudo apt-get install -y gettext
+
     - name: 'Update hosts.ini dynamically'
       env:
         MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
         MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
       run: |
         envsubst < inventory/hosts.ini.template > inventory/hosts.ini
+
     - name: 'Deploy hosts.ini'
       run: |
         sudo mkdir -p /usr/local/ansible/inventory
