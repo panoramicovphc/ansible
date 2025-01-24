@@ -9,6 +9,12 @@
         mode: '0755'
         state: file
 
+    - name: Ensure the /tmp/ansible-setup.log file has correct permissions
+      file:
+        path: /tmp/ansible-setup.log
+        state: touch
+        mode: '0644'
+
     - name: Execute the ansible-setup.sh script
       command: /usr/local/ansible/ansible-setup.sh
       register: setup_script_output
