@@ -48,7 +48,7 @@ jobs:
 
     - name: 'Deploy Ansible project'
       run: |
-        sudo rm-rf /usr/local/ansible/*
+        sudo rm -rf /usr/local/ansible/*
         sudo mkdir -p /usr/local/ansible
         sudo chmod 0755 /usr/local/ansible
         sudo cp -r . /usr/local/ansible/
