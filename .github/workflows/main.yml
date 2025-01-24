@@ -8,48 +8,67 @@ on:
 
 jobs:
 
-  publish-ansible-project:
+  setup-ansible-runtime:
+
     runs-on:
       - 'self-hosted'
 
     steps:
 
-    - name: 'Checkout repository'
-      uses: 'actions/checkout@v2'
+      - name: 'Checkout repository'
+        uses: 'actions/checkout@v2'
 
-    - name: 'Run ansible-setup.sh'
-      run: |
-        chmod +x ./ansible-setup.sh
-        ./ansible-setup.sh
+      - name: 'Run ansible-setup.sh'
+        run: |
+          chmod +x ./ansible-setup.sh
+          ./ansible-setup.sh
 
-    - name: 'Verify Ansible installation'
-      run: |
-        ansible --version
+      - name: 'Verify Ansible installation'
+        run: |
+          ansible --version
 
-    - name: 'Checkout repository'
-      uses: 'actions/checkout@v2'
+  prepare-ansible-project:
 
-    - name: 'Install gettext (envsubst)'
-      run: |
-        sudo apt-get install -y gettext
+    needs:
+      - 'setup-ansible-runtime'
 
-    - name: 'Update hosts.ini dynamically'
-      env:
-        MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
-        MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
-      run: |
-        envsubst < inventory/hosts.ini.template > inventory/hosts.ini
+    runs-on:
+      - 'self-hosted'
 
-    - name: 'Backup Ansible project'
-      run: |
-        sudo mkdir -p /usr/local/ansible_backup
-        timestamp=$(date +"%Y%m%d%H%M%S")
-        sudo tar -czvf /usr/local/ansible_backup/ansible_backup_$timestamp.zip /usr/local/ansible
+    steps:
+      - name: 'Checkout repository'
+        uses: 'actions/checkout@v2'
 
-    - name: 'Deploy Ansible project'
-      run: |
-        sudo rm -rf /usr/local/ansible/*
-        sudo mkdir -p /usr/local/ansible
-        sudo chmod 0755 /usr/local/ansible
-        sudo cp -r . /usr/local/ansible/
-        sudo rm -rf /usr/local/ansible/.github
+      - name: 'Install gettext (envsubst)'
+        run: |
+          sudo apt-get install -y gettext
+
+      - name: 'Update hosts.ini dynamically'
+        env:
+          MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
+          MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
+        run: |
+          envsubst < inventory/hosts.ini.template > inventory/hosts.ini
+
+  deploy-ansible-project:
+
+    needs:
+      - 'prepare-ansible-project'
+
+    runs-on:
+      - 'self-hosted'
+
+    steps:
+      - name: 'Backup Ansible project'
+        run: |
+          sudo mkdir -p /usr/local/ansible_backup
+          timestamp=$(date +"%Y%m%d%H%M%S")
+          sudo tar -czvf /usr/local/ansible_backup/ansible_backup_$timestamp.zip /usr/local/ansible
+
+      - name: 'Deploy Ansible project'
+        run: |
+          sudo rm -rf /usr/local/ansible/*
+          sudo mkdir -p /usr/local/ansible
+          sudo chmod 0755 /usr/local/ansible
+          sudo cp -r . /usr/local/ansible/
+          sudo rm -rf /usr/local/ansible/.github
