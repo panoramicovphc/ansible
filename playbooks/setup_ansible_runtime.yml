@@ -1,0 +1,25 @@
+---
+- name: Setup Ansible runtime on remote nodes
+  hosts: all
+  become: true
+  tasks:
+    - name: Ensure the ansible-setup.sh script is executable
+      file:
+        path: /usr/local/ansible/ansible-setup.sh
+        mode: '0755'
+        state: file
+
+    - name: Execute the ansible-setup.sh script
+      command: /usr/local/ansible/ansible-setup.sh
+      args:
+        creates: /tmp/ansible-setup.log
+      register: setup_script_output
+
+    - name: Print the output of the setup script
+      debug:
+        var: setup_script_output.stdout
+
+    - name: Print the error output of the setup script if any
+      debug:
+        var: setup_script_output.stderr
+      when: setup_script_output.stderr != ""

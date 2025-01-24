@@ -44,7 +44,11 @@ jobs:
           sudo chmod 0755 /usr/local/ansible
           sudo cp -r . /usr/local/ansible/
           sudo rm -rf /usr/local/ansible/.github
-      - name: 'Execute Ansible playbook'
+      - name: 'Propagate Ansible project'
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/propagate_ansible_project.yml
+      - name: 'Setup Ansible runtime'
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/setup_ansible_runtime.yml
