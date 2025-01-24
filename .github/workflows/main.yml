@@ -40,8 +40,15 @@ jobs:
       run: |
         envsubst < inventory/hosts.ini.template > inventory/hosts.ini
 
-    - name: 'Deploy hosts.ini'
+    - name: 'Backup Ansible project'
       run: |
-        sudo mkdir -p /usr/local/ansible/inventory
+        sudo mkdir -p /usr/local/ansible_backup
+        timestamp=$(date +"%Y%m%d%H%M%S")
+        sudo zip -r /usr/local/ansible_backup/ansible_backup_$timestamp.zip /usr/local/ansible
+
+    - name: 'Deploy Ansible project'
+      run: |
+        sudo rm-rf /usr/local/ansible/*
+        sudo mkdir -p /usr/local/ansible
         sudo chmod 0755 /usr/local/ansible
-        sudo cp inventory/hosts.ini /usr/local/ansible/inventory/hosts.ini
+        sudo cp -r . /usr/local/ansible/
