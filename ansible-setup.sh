@@ -21,12 +21,12 @@ log "Installing dependencies..."
 if command -v apt-get >/dev/null; then
     sudo apt-get update && sudo apt-get install -y software-properties-common
     sudo apt-add-repository --yes --update ppa:ansible/ansible
-    sudo apt-get install -y ansible
+    sudo apt-get install -y ansible sshpass
 elif command -v yum >/dev/null; then
     sudo yum install -y epel-release
-    sudo yum install -y ansible
+    sudo yum install -y ansible sshpass
 else
-    log "Unsupported package manager. Please install Ansible manually."
+    log "Unsupported package manager. Please install Ansible and sshpass manually."
     exit 1
 fi
 
@@ -36,5 +36,11 @@ if ! command -v ansible >/dev/null; then
     exit 1
 fi
 
-log "Ansible installation completed successfully"
+log "Verifying sshpass installation..."
+if ! command -v sshpass >/dev/null; then
+    log "sshpass installation failed."
+    exit 1
+fi
+
+log "Ansible and sshpass installation completed successfully"
 log "Ansible version: $(ansible --version | head -n 1)"
