@@ -26,9 +26,16 @@
         path: "/usr/local/{{ github_repo }}_backup"
         state: directory
 
-    - name: Zip the current directory with timestamp
+    - name: Check if there are files to backup
+      command: "find /usr/local/{{ github_repo }} -mindepth 1 -print -quit"
+      register: files_exist
+      changed_when: false
+      failed_when: false
+
+    - name: Zip the current directory with timestamp if files exist
       command: >
         zip -r /usr/local/{{ github_repo }}_backup/{{ github_repo }}_backup_$(date +%Y%m%d%H%M%S).zip /usr/local/{{ github_repo }}
+      when: files_exist.stdout != ""
       args:
         creates: "/usr/local/{{ github_repo }}_backup/{{ github_repo }}_backup_$(date +%Y%m%d%H%M%S).zip"
 
