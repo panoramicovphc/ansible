@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  deploy-ansible-project:
+  publish-ansible-project:
     runs-on:
       - 'self-hosted'
 
