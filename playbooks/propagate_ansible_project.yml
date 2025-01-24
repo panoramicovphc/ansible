@@ -2,9 +2,12 @@
 - name: Add SSH key to known_hosts
   hosts: all
   tasks:
-    - name: Add remote host to known_hosts
-      ansible.builtin.shell: ssh-keyscan -H devbian.mkh >> ~/.ssh/known_hosts
-      delegate_to: localhost
+    - name: Disable host key checking
+      set_fact:
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+
+    - name: Gather facts
+      ansible.builtin.gather_facts:
 
 - name: Propagate Ansible project to remote nodes
   hosts: all
