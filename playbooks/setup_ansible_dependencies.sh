@@ -1,0 +1,27 @@
+---
+- name: Playbook to install Ansible dependencies
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Gather OS distribution information
+      ansible.builtin.setup:
+        filter: ansible_distribution
+      register: setup_distribution
+
+    - name: Install dependencies on Debian-based systems
+      apt:
+        name: 
+          - sshpass
+          - rsync
+        state: present
+        update_cache: yes
+      when: setup_distribution.ansible_facts.ansible_distribution == "Debian" or setup_distribution.ansible_facts.ansible_distribution == "Ubuntu"
+
+    - name: Install dependencies on Red Hat-based systems
+      yum:
+        name: 
+          - sshpass
+          - rsync
+        state: present
+      when: setup_distribution.ansible_facts.ansible_distribution == "RedHat" or setup_distribution.ansible_facts.ansible_distribution == "CentOS"
