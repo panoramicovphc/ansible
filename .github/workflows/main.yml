@@ -56,3 +56,7 @@ jobs:
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/setup_ansible_runtime.yml
+      - name: 'Setup Terraform runtime'
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/setup_terraform_runtime.yml
