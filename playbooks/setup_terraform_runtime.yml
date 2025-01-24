@@ -72,4 +72,4 @@
   vars:
     github_user: "MK-House"
     github_repo: "terraform"
-    script_file: "terraform_setup.sh"
+    script_file: "terraform-setup.sh"
