@@ -21,11 +21,6 @@ jobs:
     - name: 'Verify Ansible installation'
       run: |
         ansible --version
-
-  prepare-ansible-inventory:
-    runs-on:
-      - 'ubuntu-latest'
-    steps:
     - name: 'Checkout repository'
       uses: 'actions/checkout@v2'
     - name: 'Install gettext (envsubst)'
@@ -42,14 +37,6 @@ jobs:
       with:
         name: 'hosts'
         path: 'inventory/hosts.ini'
-
-  propagate-ansible-project:
-    needs:
-      - 'setup-ansible-runtime'
-      - 'prepare-ansible-inventory'
-    runs-on:
-      - 'self-hosted'
-    steps:
     - name: 'Checkout repository'
       uses: 'actions/checkout@v2'
     - name: 'Run ansible-setup.sh'
