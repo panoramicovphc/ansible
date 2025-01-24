@@ -51,6 +51,11 @@
       loop: "{{ files_to_remove.files }}"
       become: true
 
+    - name: Ensure the /usr/local/{{ github_repo }} directory exists
+      file:
+        path: "/usr/local/{{ github_repo }}"
+        state: directory
+
     - name: Unzip the downloaded release
       unarchive:
         src: "/tmp/{{ github_repo }}-{{ release_tag }}.tar.gz"
