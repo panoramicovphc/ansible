@@ -9,6 +9,12 @@
         mode: '0755'
         state: file
 
+    - name: Remove the ansible-setup.log file if it exists
+      file:
+        path: /tmp/ansible-setup.log
+        state: absent
+      become: true
+
     - name: Execute the ansible-setup.sh script as root
       command: /usr/local/ansible/ansible-setup.sh
       register: setup_script_output
