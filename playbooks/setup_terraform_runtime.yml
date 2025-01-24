@@ -63,8 +63,13 @@
         remote_src: yes
         extra_opts: [--strip-components=1]
 
+    - name: Give execute permission to the script
+      file:
+        path: "/usr/local/{{ github_repo }}/{{ script_file }}"
+        mode: '0755'
+
     - name: Execute the script in su mode
-      command: "su -c '/usr/local/{{ github_repo }}/{{ script_file }}'"
+      command: "sudo '/usr/local/{{ github_repo }}/{{ script_file }}'"
       args:
         executable: /bin/bash
       become: true
