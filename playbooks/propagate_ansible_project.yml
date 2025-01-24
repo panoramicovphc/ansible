@@ -1,4 +1,11 @@
 ---
+- name: Add SSH key to known_hosts
+  hosts: all
+  tasks:
+    - name: Add remote host to known_hosts
+      ansible.builtin.shell: ssh-keyscan -H devbian.mkh >> ~/.ssh/known_hosts
+      delegate_to: localhost
+
 - name: Propagate Ansible project to remote nodes
   hosts: all
   become: true
