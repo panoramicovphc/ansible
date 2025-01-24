@@ -1,13 +1,18 @@
 ---
-- name: Add SSH key to known_hosts
+- name: Add host keys to known_hosts
   hosts: all
-  tasks:
-    - name: Disable host key checking
-      set_fact:
-        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+  gather_facts: false
 
-    - name: Gather facts
-      ansible.builtin.gather_facts:
+  tasks:
+    - name: Get host key
+      shell: ssh-keyscan -H {{ ansible_host }}
+      register: host_key
+
+    - name: Add key to known_hosts
+      lineinfile:
+        path: ~/.ssh/known_hosts
+        line: "{{ host_key.stdout }}"
+        create: yes
 
 - name: Propagate Ansible project to remote nodes
   hosts: all
