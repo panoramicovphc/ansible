@@ -9,40 +9,30 @@ on:
 jobs:
 
   setup-ansible-runtime:
-
     runs-on:
       - 'self-hosted'
-
     steps:
-
       - name: 'Checkout repository'
         uses: 'actions/checkout@v2'
-
       - name: 'Run ansible-setup.sh'
         run: |
           chmod +x ./ansible-setup.sh
           ./ansible-setup.sh
-
       - name: 'Verify Ansible installation'
         run: |
           ansible --version
 
   prepare-ansible-project:
-
     needs:
       - 'setup-ansible-runtime'
-
     runs-on:
       - 'self-hosted'
-
     steps:
       - name: 'Checkout repository'
         uses: 'actions/checkout@v2'
-
       - name: 'Install gettext (envsubst)'
         run: |
           sudo apt-get install -y gettext
-
       - name: 'Update hosts.ini dynamically'
         env:
           MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
@@ -51,20 +41,16 @@ jobs:
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
 
   deploy-ansible-project:
-
     needs:
       - 'prepare-ansible-project'
-
     runs-on:
       - 'self-hosted'
-
     steps:
       - name: 'Backup Ansible project'
         run: |
           sudo mkdir -p /usr/local/ansible_backup
           timestamp=$(date +"%Y%m%d%H%M%S")
           sudo tar -czvf /usr/local/ansible_backup/ansible_backup_$timestamp.zip /usr/local/ansible
-
       - name: 'Deploy Ansible project'
         run: |
           sudo rm -rf /usr/local/ansible/*
@@ -72,3 +58,14 @@ jobs:
           sudo chmod 0755 /usr/local/ansible
           sudo cp -r . /usr/local/ansible/
           sudo rm -rf /usr/local/ansible/.github
+
+  propagate-ansible-project:
+    needs:
+      - 'setup-ansible-runtime'
+      - 'deploy-ansible-project'
+    runs-on:
+      - 'self-hosted'
+    steps:
+      - name: 'Execute Ansible playbook'
+        run: |
+          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/propagate_ansible_project.yaml
