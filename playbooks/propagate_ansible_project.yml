@@ -1,19 +1,4 @@
 ---
-- name: Add host keys to known_hosts
-  hosts: all
-  gather_facts: false
-
-  tasks:
-    - name: Get host key
-      shell: ssh-keyscan -H {{ ansible_host }}
-      register: host_key
-
-    - name: Add key to known_hosts
-      lineinfile:
-        path: ~/.ssh/known_hosts
-        line: "{{ host_key.stdout }}"
-        create: yes
-
 - name: Propagate Ansible project to remote nodes
   hosts: all
   become: true

@@ -46,4 +46,5 @@ jobs:
           sudo rm -rf /usr/local/ansible/.github
       - name: 'Execute Ansible playbook'
         run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/propagate_ansible_project.yml
