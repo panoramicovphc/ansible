@@ -44,7 +44,7 @@ jobs:
       run: |
         sudo mkdir -p /usr/local/ansible_backup
         timestamp=$(date +"%Y%m%d%H%M%S")
-        sudo zip -r /usr/local/ansible_backup/ansible_backup_$timestamp.zip /usr/local/ansible
+        sudo tar -czvf /usr/local/ansible_backup/ansible_backup_$timestamp.zip /usr/local/ansible
 
     - name: 'Deploy Ansible project'
       run: |
