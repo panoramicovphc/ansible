@@ -68,4 +68,4 @@ jobs:
     steps:
       - name: 'Execute Ansible playbook'
         run: |
-          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/propagate_ansible_project.yaml
+          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/propagate_ansible_project.yaml
