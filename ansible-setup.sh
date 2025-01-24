@@ -21,12 +21,12 @@ log "Installing dependencies..."
 if command -v apt-get >/dev/null; then
     sudo apt-get update && sudo apt-get install -y software-properties-common
     sudo apt-add-repository --yes --update ppa:ansible/ansible
-    sudo apt-get install -y ansible sshpass
+    sudo apt-get install -y ansible sshpass rsync
 elif command -v yum >/dev/null; then
     sudo yum install -y epel-release
-    sudo yum install -y ansible sshpass
+    sudo yum install -y ansible sshpass rsync
 else
-    log "Unsupported package manager. Please install Ansible and sshpass manually."
+    log "Unsupported package manager. Please install Ansible, sshpass, and rsync manually."
     exit 1
 fi
 
@@ -42,5 +42,11 @@ if ! command -v sshpass >/dev/null; then
     exit 1
 fi
 
-log "Ansible and sshpass installation completed successfully"
+log "Verifying rsync installation..."
+if ! command -v rsync >/dev/null; then
+    log "rsync installation failed."
+    exit 1
+fi
+
+log "Ansible, sshpass, and rsync installation completed successfully"
 log "Ansible version: $(ansible --version | head -n 1)"
