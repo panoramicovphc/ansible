@@ -6,6 +6,9 @@ on:
     branches:
       - 'main'
 
+env:
+  ANSIBLE_PROJECT: "${{ vars.ANSIBLE_PROJECT }}"
+
 jobs:
 
   setup-ansible-runtime:
@@ -38,29 +41,29 @@ jobs:
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: 'Backup Ansible project'
         run: |
-          sudo mkdir -p /usr/local/ansible_backup
+          sudo mkdir -p ${ANSIBLE_PROJECT}_backup
           timestamp=$(date +"%Y%m%d%H%M%S")
-          sudo tar -czvf /usr/local/ansible_backup/ansible_backup_$timestamp.zip /usr/local/ansible
+          sudo tar -czvf ${ANSIBLE_PROJECT}_backup/ansible_backup_$timestamp.zip ${ANSIBLE_PROJECT}
       - name: 'Deploy Ansible project'
         run: |
-          sudo rm -rf /usr/local/ansible/*
-          sudo mkdir -p /usr/local/ansible
-          sudo chmod 0755 /usr/local/ansible
-          sudo cp -r . /usr/local/ansible/
-          sudo rm -rf /usr/local/ansible/.github
+          sudo rm -rf ${ANSIBLE_PROJECT}/*
+          sudo mkdir -p ${ANSIBLE_PROJECT}
+          sudo chmod 0755 ${ANSIBLE_PROJECT}
+          sudo cp -r . ${ANSIBLE_PROJECT}/
+          sudo rm -rf ${ANSIBLE_PROJECT}/.github
       - name: 'Setup Ansible dependencies'
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/setup_ansible_dependencies.yml
+          ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/setup_ansible_dependencies.yml
       - name: 'Propagate Ansible project'
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/propagate_ansible_project.yml
+          ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/propagate_ansible_project.yml
       - name: 'Setup Ansible runtime'
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/setup_ansible_runtime.yml
+          ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/setup_ansible_runtime.yml
       - name: 'Setup Terraform runtime'
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i /usr/local/ansible/inventory/hosts.ini /usr/local/ansible/playbooks/setup_terraform_runtime.yml
+          ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/setup_terraform_runtime.yml
