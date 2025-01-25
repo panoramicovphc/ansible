@@ -30,6 +30,10 @@ jobs:
         env:
           MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
           MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
+          CF_TUNNEL_TOKEN_TANKIAN: ${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}
+          CF_TUNNEL_TOKEN_TRUJILLO: ${{ secrets.CF_TUNNEL_TOKEN_TRUJILLO }}
+          CF_TUNNEL_TOKEN_CHUCK: ${{ secrets.CF_TUNNEL_TOKEN_CHUCK }}
+          CF_TUNNEL_TOKEN_DEVBIAN: ${{ secrets.CF_TUNNEL_TOKEN_DEVBIAN }}
         run: |
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: 'Backup Ansible project'
