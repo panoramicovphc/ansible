@@ -61,7 +61,6 @@ jobs:
             sudo tar -czvf ${ANSIBLE_PROJECT}_backup/ansible_backup_$timestamp.zip ${ANSIBLE_PROJECT}
           else
             echo "Directory ${ANSIBLE_PROJECT} does not exist."
-            exit 1
           fi
       - name: "Deploy Ansible project"
         run: |
