@@ -1,7 +1,4 @@
 [prd]
-tankian.mkh    ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}
-trujillo.mkh   ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TRUJILLO}
-chuck.mkh      ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_CHUCK}
-
-[lab]
-devbian.mkh    ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_DEVBIAN}
+tankian.mkh    ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "rabbitmq" ]'
+trujillo.mkh   ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TRUJILLO}   labels='[]'
+chuck.mkh      ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_CHUCK}      labels='[]'

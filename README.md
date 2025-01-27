@@ -6,22 +6,11 @@ This repository contains Ansible playbooks for setting up and managing the infra
 
 The playbooks in this repository are designed to:
 
-- Set up the Terraform runtime environment.
 - Set up the Ansible runtime environment.
 - Install necessary dependencies for Ansible.
 - Propagate the Ansible project to remote nodes.
 
 ## Playbooks
-
-### setup_terraform_runtime.yml
-
-This playbook sets up the Terraform runtime environment by:
-
-- Installing necessary packages.
-- Downloading the latest release of Terraform from GitHub.
-- Creating backups of existing Terraform installations.
-- Unzipping and installing the new release.
-- Executing a setup script.
 
 ### setup_ansible_runtime.yml
 
@@ -49,6 +38,17 @@ This playbook propagates the Ansible project to remote nodes by:
 
 The `inventory/hosts.ini.template` file contains the inventory configuration for the Ansible playbooks. It uses environment variables for sensitive information.
 
+### Indicating Structural Solutions
+
+In the inventory file, you can specify which structural solutions (like RabbitMQ and Redis) will be served by each host using the `labels` attribute. This allows multiple solutions to share the same instance on a host. For example:
+
+```ini
+[prd]
+tankian.mkh    ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "rabbitmq" ]'
+trujillo.mkh   ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TRUJILLO}   labels='[]'
+chuck.mkh      ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_CHUCK}      labels='[]'
+```
+
 ## GitHub Actions Workflow
 
 The `.github/workflows/main.yml` file contains a GitHub Actions workflow for automating the deployment of the Ansible project. It includes steps for setting up the runtime environments, installing dependencies, and propagating the project.
@@ -56,6 +56,7 @@ The `.github/workflows/main.yml` file contains a GitHub Actions workflow for aut
 ## Usage
 
 1. Clone the repository:
+
     ```bash
     git clone https://github.com/yourusername/mk-house.git
     cd mk-house/ansible
@@ -64,8 +65,8 @@ The `.github/workflows/main.yml` file contains a GitHub Actions workflow for aut
 2. Customize the `inventory/hosts.ini.template` file with your environment variables.
 
 3. Run the playbooks using Ansible:
+
     ```bash
-    ansible-playbook -i inventory/hosts.ini playbooks/setup_terraform_runtime.yml
     ansible-playbook -i inventory/hosts.ini playbooks/setup_ansible_runtime.yml
     ansible-playbook -i inventory/hosts.ini playbooks/setup_ansible_dependencies.yml
     ansible-playbook -i inventory/hosts.ini playbooks/propagate_ansible_project.yml
