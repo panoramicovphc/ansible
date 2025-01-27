@@ -10,7 +10,7 @@
 
     - name: "Create backup directory if it doesn't exist"
       file:
-        path: "/usr/local/ansible_backup"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}_backup"
         state: "directory"
         owner: "root"
         group: "root"
@@ -18,8 +18,8 @@
 
     - name: "Create a zip backup of the Ansible project"
       archive:
-        path: "/usr/local/ansible/"
-        dest: "/usr/local/ansible_backup/ansible_backup_{{ timestamp }}.zip"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
+        dest: "{{ lookup('env', 'ANSIBLE_PROJECT') }}_backup/ansible_backup_{{ timestamp }}.zip"
         format: "zip"
 
 - name: "Clean and propagate Ansible project to remote nodes"
@@ -29,20 +29,20 @@
   tasks:
     - name: "Ensure destination directory exists"
       file:
-        path: "/usr/local/ansible/"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
         state: "directory"
         owner: "root"
         group: "root"
         mode: "0755"
 
     - name: "Clean the destination directory"
-      command: "rm -rf /usr/local/ansible/* /usr/local/ansible/.[!.]* /usr/local/ansible/..?*"
+      command: "rm -rf {{ lookup('env', 'ANSIBLE_PROJECT') }}/* {{ lookup('env', 'ANSIBLE_PROJECT') }}/.[!.]* {{ lookup('env', 'ANSIBLE_PROJECT') }}/..?*"
       ignore_errors: true
 
     - name: "Copy Ansible project to remote nodes"
       synchronize:
-        src: "/usr/local/ansible/"
-        dest: "/usr/local/ansible/"
+        src: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
+        dest: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
         delete: yes
         recursive: yes
         rsync_opts:
@@ -50,7 +50,7 @@
 
     - name: "Set permissions on Ansible project files"
       file:
-        path: "/usr/local/ansible/"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
         state: "directory"
         recurse: yes
         owner: "root"

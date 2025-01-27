@@ -64,7 +64,13 @@ The `.github/workflows/main.yml` file contains a GitHub Actions workflow for aut
 
 2. Customize the `inventory/hosts.ini.template` file with your environment variables.
 
-3. Run the playbooks using Ansible:
+3. Set the `ANSIBLE_PROJECT` environment variable:
+
+    ```bash
+    export ANSIBLE_PROJECT=/usr/local/iac/ansible
+    ```
+
+4. Run the playbooks using Ansible:
 
     ```bash
     ansible-playbook -i inventory/hosts.ini playbooks/setup_ansible_runtime.yml

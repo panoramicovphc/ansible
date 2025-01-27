@@ -5,7 +5,7 @@
   tasks:
     - name: "Ensure the ansible-setup.sh script is executable"
       file:
-        path: "/usr/local/ansible/ansible-setup.sh"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/ansible-setup.sh"
         mode: "0755"
         state: "file"
 
@@ -16,7 +16,7 @@
       become: true
 
     - name: "Execute the ansible-setup.sh script as root"
-      command: "/usr/local/ansible/ansible-setup.sh"
+      command: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/ansible-setup.sh"
       register: setup_script_output
       become: true
 
