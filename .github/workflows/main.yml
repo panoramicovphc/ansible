@@ -12,6 +12,7 @@ env:
 jobs:
 
   setup-ansible-runtime:
+    name: "Setup Ansible runtime"
     runs-on:
       - "self-hosted"
     steps:
