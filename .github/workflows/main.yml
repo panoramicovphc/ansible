@@ -1,10 +1,10 @@
-name: 'Publish Ansible project'
-run-name: '${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}'
+name: "Publish Ansible project"
+run-name: "${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}"
 
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 
 env:
   ANSIBLE_PROJECT: "${{ vars.ANSIBLE_PROJECT }}"
@@ -13,53 +13,53 @@ jobs:
 
   setup-ansible-runtime:
     runs-on:
-      - 'self-hosted'
+      - "self-hosted"
     steps:
-      - name: 'Checkout repository'
-        uses: 'actions/checkout@v2'
-      - name: 'Run ansible-setup.sh'
+      - name: "Checkout repository"
+        uses: "actions/checkout@v2"
+      - name: "Run ansible-setup.sh"
         run: |
           chmod +x ./ansible-setup.sh
           ./ansible-setup.sh
-      - name: 'Verify Ansible installation'
+      - name: "Verify Ansible installation"
         run: |
           ansible --version
-      - name: 'Checkout repository'
-        uses: 'actions/checkout@v2'
-      - name: 'Install gettext (envsubst)'
+      - name: "Checkout repository"
+        uses: "actions/checkout@v2"
+      - name: "Install gettext (envsubst)"
         run: |
           sudo apt-get install -y gettext
-      - name: 'Update hosts.ini dynamically'
+      - name: "Update hosts.ini dynamically"
         env:
-          MKADMIN_LOGIN: ${{ vars.MKADMIN_LOGIN }}
-          MKADMIN_PASSWORD: ${{ secrets.MKADMIN_PASSWORD }}
-          CF_TUNNEL_TOKEN_TANKIAN: ${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}
-          CF_TUNNEL_TOKEN_TRUJILLO: ${{ secrets.CF_TUNNEL_TOKEN_TRUJILLO }}
-          CF_TUNNEL_TOKEN_CHUCK: ${{ secrets.CF_TUNNEL_TOKEN_CHUCK }}
-          CF_TUNNEL_TOKEN_DEVBIAN: ${{ secrets.CF_TUNNEL_TOKEN_DEVBIAN }}
+          MKADMIN_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
+          MKADMIN_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
+          CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
+          CF_TUNNEL_TOKEN_TRUJILLO: "${{ secrets.CF_TUNNEL_TOKEN_TRUJILLO }}"
+          CF_TUNNEL_TOKEN_CHUCK: "${{ secrets.CF_TUNNEL_TOKEN_CHUCK }}"
+          CF_TUNNEL_TOKEN_DEVBIAN: "${{ secrets.CF_TUNNEL_TOKEN_DEVBIAN }}"
         run: |
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
-      - name: 'Backup Ansible project'
+      - name: "Backup Ansible project"
         run: |
           sudo mkdir -p ${ANSIBLE_PROJECT}_backup
           timestamp=$(date +"%Y%m%d%H%M%S")
           sudo tar -czvf ${ANSIBLE_PROJECT}_backup/ansible_backup_$timestamp.zip ${ANSIBLE_PROJECT}
-      - name: 'Deploy Ansible project'
+      - name: "Deploy Ansible project"
         run: |
           sudo rm -rf ${ANSIBLE_PROJECT}/*
           sudo mkdir -p ${ANSIBLE_PROJECT}
           sudo chmod 0755 ${ANSIBLE_PROJECT}
           sudo cp -r . ${ANSIBLE_PROJECT}/
           sudo rm -rf ${ANSIBLE_PROJECT}/.github
-      - name: 'Setup Ansible dependencies'
+      - name: "Setup Ansible dependencies"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/setup_ansible_dependencies.yml
-      - name: 'Propagate Ansible project'
+      - name: "Propagate Ansible project"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/propagate_ansible_project.yml
-      - name: 'Setup Ansible runtime'
+      - name: "Setup Ansible runtime"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/setup_ansible_runtime.yml

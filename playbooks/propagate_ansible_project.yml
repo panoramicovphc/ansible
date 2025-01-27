@@ -1,58 +1,58 @@
 ---
-- name: Propagate Ansible project to remote nodes
-  hosts: all
+- name: "Propagate Ansible project to remote nodes"
+  hosts: "all"
   become: true
 
   tasks:
-    - name: Create a timestamp variable
+    - name: "Create a timestamp variable"
       set_fact:
         timestamp: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
 
-    - name: Create backup directory if it doesn't exist
+    - name: "Create backup directory if it doesn't exist"
       file:
-        path: /usr/local/ansible_backup
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
+        path: "/usr/local/ansible_backup"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0755"
 
-    - name: Create a zip backup of the Ansible project
+    - name: "Create a zip backup of the Ansible project"
       archive:
-        path: /usr/local/ansible/
+        path: "/usr/local/ansible/"
         dest: "/usr/local/ansible_backup/ansible_backup_{{ timestamp }}.zip"
-        format: zip
+        format: "zip"
 
-- name: Clean and propagate Ansible project to remote nodes
-  hosts: all
+- name: "Clean and propagate Ansible project to remote nodes"
+  hosts: "all"
   become: true
 
   tasks:
-    - name: Ensure destination directory exists
+    - name: "Ensure destination directory exists"
       file:
-        path: /usr/local/ansible/
-        state: directory
-        owner: root
-        group: root
-        mode: '0755'
+        path: "/usr/local/ansible/"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0755"
 
-    - name: Clean the destination directory
-      command: rm -rf /usr/local/ansible/* /usr/local/ansible/.[!.]* /usr/local/ansible/..?*
+    - name: "Clean the destination directory"
+      command: "rm -rf /usr/local/ansible/* /usr/local/ansible/.[!.]* /usr/local/ansible/..?*"
       ignore_errors: true
 
-    - name: Copy Ansible project to remote nodes
+    - name: "Copy Ansible project to remote nodes"
       synchronize:
-        src: /usr/local/ansible/
-        dest: /usr/local/ansible/
+        src: "/usr/local/ansible/"
+        dest: "/usr/local/ansible/"
         delete: yes
         recursive: yes
         rsync_opts:
           - "--chmod=D0755,F0644"
 
-    - name: Set permissions on Ansible project files
+    - name: "Set permissions on Ansible project files"
       file:
-        path: /usr/local/ansible/
-        state: directory
+        path: "/usr/local/ansible/"
+        state: "directory"
         recurse: yes
-        owner: root
-        group: root
-        mode: '0755'
+        owner: "root"
+        group: "root"
+        mode: "0755"
