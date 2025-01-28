@@ -50,7 +50,6 @@ jobs:
           CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
           CF_TUNNEL_TOKEN_TRUJILLO: "${{ secrets.CF_TUNNEL_TOKEN_TRUJILLO }}"
           CF_TUNNEL_TOKEN_CHUCK: "${{ secrets.CF_TUNNEL_TOKEN_CHUCK }}"
-          CF_TUNNEL_TOKEN_DEVBIAN: "${{ secrets.CF_TUNNEL_TOKEN_DEVBIAN }}"
         run: |
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: "Backup Ansible project"
@@ -58,7 +57,9 @@ jobs:
           if [ -d "${ANSIBLE_PROJECT}" ]; then
             sudo mkdir -p ${ANSIBLE_PROJECT}_backup
             timestamp=$(date +"%Y%m%d%H%M%S")
-            sudo tar -czvf ${ANSIBLE_PROJECT}_backup/ansible_backup_$timestamp.zip ${ANSIBLE_PROJECT}
+            sudo tar -czvf \
+              ${ANSIBLE_PROJECT}_backup/ansible_backup_$timestamp.zip \
+              ${ANSIBLE_PROJECT}
           else
             echo "Directory ${ANSIBLE_PROJECT} does not exist."
           fi
@@ -72,12 +73,15 @@ jobs:
       - name: "Setup Ansible dependencies"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/setup_ansible_dependencies.yml
+          ansible-playbook ${ANSIBLE_PROJECT}/playbooks/setup_ansible_dependencies.yml \
+            -i ${ANSIBLE_PROJECT}/inventory/hosts.ini
       - name: "Propagate Ansible project"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/propagate_ansible_project.yml
+          ansible-playbook ${ANSIBLE_PROJECT}/playbooks/propagate_ansible_project.yml \
+            -i ${ANSIBLE_PROJECT}/inventory/hosts.ini
       - name: "Setup Ansible runtime"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook -i ${ANSIBLE_PROJECT}/inventory/hosts.ini ${ANSIBLE_PROJECT}/playbooks/setup_ansible_runtime.yml
+          ansible-playbook ${ANSIBLE_PROJECT}/playbooks/setup_ansible_runtime.yml \
+            -i ${ANSIBLE_PROJECT}/inventory/hosts.ini

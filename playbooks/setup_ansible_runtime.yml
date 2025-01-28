@@ -17,14 +17,15 @@
 
     - name: "Execute the ansible-setup.sh script as root"
       command: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/ansible-setup.sh"
-      register: setup_script_output
+      register: "setup_script_output"
       become: true
 
     - name: "Print the output of the setup script"
       debug:
-        var: setup_script_output.stdout
+        var: "setup_script_output.stdout"
 
     - name: "Print the error output of the setup script if any"
       debug:
-        var: setup_script_output.stderr
-      when: setup_script_output.stderr != ""
+        var: "setup_script_output.stderr"
+      when: |
+        setup_script_output.stderr != ""

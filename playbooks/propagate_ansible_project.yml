@@ -36,7 +36,11 @@
         mode: "0755"
 
     - name: "Clean the destination directory"
-      command: "rm -rf {{ lookup('env', 'ANSIBLE_PROJECT') }}/* {{ lookup('env', 'ANSIBLE_PROJECT') }}/.[!.]* {{ lookup('env', 'ANSIBLE_PROJECT') }}/..?*"
+      command: |
+        rm -rf \
+          {{ lookup('env', 'ANSIBLE_PROJECT') }}/* \
+          {{ lookup('env', 'ANSIBLE_PROJECT') }}/.[!.]* \
+          {{ lookup('env', 'ANSIBLE_PROJECT') }}/..?*
       ignore_errors: true
 
     - name: "Copy Ansible project to remote nodes"
