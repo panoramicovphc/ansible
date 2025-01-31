@@ -77,6 +77,7 @@ def main():
             driver_opts = {}
         driver_opts['device'] = path
         driver_opts['o'] = 'bind'
+        driver_opts['type'] = 'none'
 
     changed, stdout, stderr = create_volume(name, driver, driver_opts, labels)
     if changed:
