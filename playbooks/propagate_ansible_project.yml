@@ -21,6 +21,8 @@
         path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
         dest: "{{ lookup('env', 'ANSIBLE_PROJECT') }}_backup/ansible_backup_{{ timestamp }}.zip"
         format: "zip"
+        exclude_path:
+          - "{{ lookup('env', 'ANSIBLE_PROJECT') }}/_dropfolder"
 
 - name: "Clean and propagate Ansible project to remote nodes"
   hosts: "all"
