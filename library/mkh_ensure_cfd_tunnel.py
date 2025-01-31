@@ -2,6 +2,11 @@
 
 from ansible.module_utils.basic import AnsibleModule
 import requests
+import os
+
+def log_to_file(log_path, message):
+    with open(log_path, 'a') as log_file:
+        log_file.write(message + '\n')
 
 def main():
     module = AnsibleModule(
@@ -11,6 +16,7 @@ def main():
             tunnel_name=dict(type='str', required=True),
             private_service=dict(type='str', required=True),
             public_hostname=dict(type='str', required=True),
+            log_path=dict(type='str', required=False, default='/tmp/mkh_ensure_cfd_tunnel.log')
         )
     )
 
@@ -19,6 +25,7 @@ def main():
     tunnel_name = module.params['tunnel_name']
     private_service = module.params['private_service']
     public_hostname = module.params['public_hostname']
+    log_path = module.params['log_path']
 
     headers = {
         "Authorization": f"Bearer {api_token}",
@@ -26,27 +33,41 @@ def main():
     }
 
     try:
-        module.log("Fetching Cloudflare tunnels...")
+        message = "Fetching Cloudflare tunnels..."
+        module.log(message)
+        log_to_file(log_path, message)
         response = requests.get(
             f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel",
             headers=headers
         )
         response.raise_for_status()
         tunnels = response.json()
-        module.log(f"Retrieved tunnels: {tunnels}")
+        message = f"Retrieved tunnels: {tunnels}"
+        module.log(message)
+        log_to_file(log_path, message)
     except requests.exceptions.RequestException as e:
-        module.fail_json(msg=f"Failed to fetch tunnels: {str(e)}")
+        error_message = f"Failed to fetch tunnels: {str(e)}"
+        module.fail_json(msg=error_message)
+        log_to_file(log_path, error_message)
 
     try:
-        module.log(f"Searching for tunnel named {tunnel_name}...")
+        message = f"Searching for tunnel named {tunnel_name}..."
+        module.log(message)
+        log_to_file(log_path, message)
         target_tunnel = next((item for item in tunnels['result'] if item['name'] == tunnel_name), None)
-        module.log(f"Target tunnel: {target_tunnel}")
+        message = f"Target tunnel: {target_tunnel}"
+        module.log(message)
+        log_to_file(log_path, message)
     except Exception as e:
-        module.fail_json(msg=f"Failed to find tunnel: {str(e)}")
+        error_message = f"Failed to find tunnel: {str(e)}"
+        module.fail_json(msg=error_message)
+        log_to_file(log_path, error_message)
 
     if not target_tunnel:
         try:
-            module.log(f"Tunnel {tunnel_name} not found, creating new tunnel...")
+            message = f"Tunnel {tunnel_name} not found, creating new tunnel..."
+            module.log(message)
+            log_to_file(log_path, message)
             create_tunnel_response = requests.post(
                 f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel",
                 headers=headers,
@@ -57,35 +78,55 @@ def main():
             )
             create_tunnel_response.raise_for_status()
             target_tunnel = create_tunnel_response.json()['result']
-            module.log(f"Created new tunnel: {target_tunnel}")
+            message = f"Created new tunnel: {target_tunnel}"
+            module.log(message)
+            log_to_file(log_path, message)
         except requests.exceptions.RequestException as e:
-            module.fail_json(msg=f"Failed to create tunnel: {str(e)}")
+            error_message = f"Failed to create tunnel: {str(e)}"
+            module.fail_json(msg=error_message)
+            log_to_file(log_path, error_message)
 
     tunnel_id = target_tunnel['id']
-    module.log(f"Tunnel ID: {tunnel_id}")
+    message = f"Tunnel ID: {tunnel_id}"
+    module.log(message)
+    log_to_file(log_path, message)
 
     try:
-        module.log("Fetching tunnel configuration...")
+        message = "Fetching tunnel configuration..."
+        module.log(message)
+        log_to_file(log_path, message)
         tunnel_config_response = requests.get(
             f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations",
             headers=headers
         )
         tunnel_config_response.raise_for_status()
         tunnel_config = tunnel_config_response.json()
-        module.log(f"Tunnel configuration: {tunnel_config}")
+        message = f"Tunnel configuration: {tunnel_config}"
+        module.log(message)
+        log_to_file(log_path, message)
     except requests.exceptions.RequestException as e:
-        module.fail_json(msg=f"Failed to fetch tunnel configuration: {str(e)}")
+        error_message = f"Failed to fetch tunnel configuration: {str(e)}"
+        module.fail_json(msg=error_message)
+        log_to_file(log_path, error_message)
 
     try:
-        module.log("Checking if ingress exists...")
+        message = "Checking if ingress exists..."
+        module.log(message)
+        log_to_file(log_path, message)
         ingress_exists = next((item for item in tunnel_config['result']['config']['ingress'] if item['service'] == private_service and item['hostname'] == public_hostname), None)
-        module.log(f"Ingress exists: {ingress_exists}")
+        message = f"Ingress exists: {ingress_exists}"
+        module.log(message)
+        log_to_file(log_path, message)
     except Exception as e:
-        module.fail_json(msg=f"Failed to check ingress: {str(e)}")
+        error_message = f"Failed to check ingress: {str(e)}"
+        module.fail_json(msg=error_message)
+        log_to_file(log_path, error_message)
 
     if not ingress_exists:
         try:
-            module.log("Ingress does not exist, adding ingress configuration...")
+            message = "Ingress does not exist, adding ingress configuration..."
+            module.log(message)
+            log_to_file(log_path, message)
             ingress_body = {
                 "config": {
                     "ingress": tunnel_config['result']['config']['ingress'] + [
@@ -106,9 +147,13 @@ def main():
                 json=ingress_body
             )
             add_ingress_response.raise_for_status()
-            module.log(f"Added ingress configuration: {ingress_body}")
+            message = f"Added ingress configuration: {ingress_body}"
+            module.log(message)
+            log_to_file(log_path, message)
         except requests.exceptions.RequestException as e:
-            module.fail_json(msg=f"Failed to add ingress configuration: {str(e)}")
+            error_message = f"Failed to add ingress configuration: {str(e)}"
+            module.fail_json(msg=error_message)
+            log_to_file(log_path, error_message)
 
     module.exit_json(changed=True, tunnel_id=tunnel_id)
 
