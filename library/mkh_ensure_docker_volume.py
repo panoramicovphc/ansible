@@ -1,0 +1,65 @@
+#!/usr/bin/python
+
+from ansible.module_utils.basic import AnsibleModule
+import subprocess
+import json
+
+def volume_exists(name):
+    result = subprocess.run(['docker', 'volume', 'ls', '--format', '{{.Name}}'], capture_output=True, text=True)
+    volumes = result.stdout.splitlines()
+    return name in volumes
+
+def create_volume(name, driver, driver_opts, labels):
+    cmd = ['docker', 'volume', 'create']
+    if driver:
+        cmd.extend(['--driver', driver])
+    if driver_opts:
+        for key, value in driver_opts.items():
+            cmd.extend(['--opt', f'{key}={value}'])
+    if labels:
+        for key, value in labels.items():
+            cmd.extend(['--label', f'{key}={value}'])
+    cmd.append(name)
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return result.returncode == 0, result.stdout, result.stderr
+
+def main():
+    module_args = dict(
+        name=dict(type='str', required=True),
+        driver=dict(type='str', required=False, default='local'),
+        driver_opts=dict(type='dict', required=False, default=None),
+        labels=dict(type='dict', required=False, default=None),
+        path=dict(type='str', required=False, default=None)
+    )
+
+    module = AnsibleModule(
+        argument_spec=module_args,
+        supports_check_mode=True
+    )
+
+    name = module.params['name']
+    driver = module.params['driver']
+    driver_opts = module.params['driver_opts']
+    labels = module.params['labels']
+    path = module.params['path']
+
+    if module.check_mode:
+        module.exit_json(changed=False)
+
+    if volume_exists(name):
+        module.exit_json(changed=False, msg=f"Volume {name} already exists")
+
+    if path:
+        if driver_opts is None:
+            driver_opts = {}
+        driver_opts['device'] = path
+        driver_opts['o'] = 'bind'
+
+    changed, stdout, stderr = create_volume(name, driver, driver_opts, labels)
+    if changed:
+        module.exit_json(changed=True, msg=f"Volume {name} created", stdout=stdout)
+    else:
+        module.fail_json(msg=f"Failed to create volume {name}", stderr=stderr)
+
+if __name__ == '__main__':
+    main()
