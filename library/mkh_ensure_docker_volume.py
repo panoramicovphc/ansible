@@ -9,6 +9,12 @@ def volume_exists(name):
     volumes = result.stdout.splitlines()
     return name in volumes
 
+def get_volume_info(name):
+    result = subprocess.run(['docker', 'volume', 'inspect', name], capture_output=True, text=True)
+    if result.returncode != 0:
+        return None
+    return json.loads(result.stdout)[0]
+
 def create_volume(name, driver, driver_opts, labels):
     cmd = ['docker', 'volume', 'create']
     if driver:
@@ -47,7 +53,20 @@ def main():
         module.exit_json(changed=False)
 
     if volume_exists(name):
-        module.exit_json(changed=False, msg=f"Volume {name} already exists")
+        volume_info = get_volume_info(name)
+        if volume_info:
+            current_driver = volume_info['Driver']
+            current_opts = volume_info['Options']
+            current_labels = volume_info['Labels']
+
+            if driver != current_driver:
+                module.fail_json(msg=f"Volume {name} exists but driver differs")
+            if driver_opts != current_opts:
+                module.fail_json(msg=f"Volume {name} exists but driver options differ")
+            if labels != current_labels:
+                module.fail_json(msg=f"Volume {name} exists but labels differ")
+
+            module.exit_json(changed=False, msg=f"Volume {name} already exists with the same configuration")
 
     if path:
         if driver_opts is None:
