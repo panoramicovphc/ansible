@@ -59,12 +59,16 @@ def main():
             current_opts = volume_info['Options']
             current_labels = volume_info['Labels']
 
-            if driver != current_driver:
+            if driver and driver != current_driver:
                 module.fail_json(msg=f"Volume {name} exists but driver differs")
-            if driver_opts != current_opts:
-                module.fail_json(msg=f"Volume {name} exists but driver options differ")
-            if labels != current_labels:
-                module.fail_json(msg=f"Volume {name} exists but labels differ")
+            if driver_opts:
+                for key, value in driver_opts.items():
+                    if key not in current_opts or current_opts[key] != value:
+                        module.fail_json(msg=f"Volume {name} exists but driver option {key} differs")
+            if labels:
+                for key, value in labels.items():
+                    if key not in current_labels or current_labels[key] != value:
+                        module.fail_json(msg=f"Volume {name} exists but label {key} differs")
 
             module.exit_json(changed=False, msg=f"Volume {name} already exists with the same configuration")
 
