@@ -3,6 +3,7 @@
 from ansible.module_utils.basic import AnsibleModule
 import subprocess
 import json
+import os
 
 def volume_exists(name):
     result = subprocess.run(['docker', 'volume', 'ls', '--format', '{{.Name}}'], capture_output=True, text=True)
@@ -29,13 +30,21 @@ def create_volume(name, driver, driver_opts, labels):
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.returncode == 0, result.stdout, result.stderr
 
+def ensure_directory(path, permissions, puid, pgid):
+    if not os.path.exists(path):
+        os.makedirs(path)
+    if permissions:
+        os.chmod(path, int(permissions, 8))
+    if puid and pgid:
+        os.chown(path, int(puid), int(pgid))
+
 def main():
     module_args = dict(
         name=dict(type='str', required=True),
         driver=dict(type='str', required=False, default='local'),
         driver_opts=dict(type='dict', required=False, default=None),
         labels=dict(type='dict', required=False, default=None),
-        path=dict(type='str', required=False, default=None)
+        device=dict(type='dict', required=False, default=None)
     )
 
     module = AnsibleModule(
@@ -47,7 +56,7 @@ def main():
     driver = module.params['driver']
     driver_opts = module.params['driver_opts']
     labels = module.params['labels']
-    path = module.params['path']
+    device = module.params['device']
 
     if module.check_mode:
         module.exit_json(changed=False)
@@ -72,12 +81,18 @@ def main():
 
             module.exit_json(changed=False, msg=f"Volume {name} already exists with the same configuration")
 
-    if path:
-        if driver_opts is None:
-            driver_opts = {}
-        driver_opts['device'] = path
-        driver_opts['o'] = 'bind'
-        driver_opts['type'] = 'none'
+    if device:
+        path = device.get('path')
+        permissions = device.get('permissions')
+        puid = device.get('puid')
+        pgid = device.get('pgid')
+        if path:
+            ensure_directory(path, permissions, puid, pgid)
+            if driver_opts is None:
+                driver_opts = {}
+            driver_opts['device'] = path
+            driver_opts['o'] = 'bind'
+            driver_opts['type'] = 'none'
 
     changed, stdout, stderr = create_volume(name, driver, driver_opts, labels)
     if changed:
