@@ -27,11 +27,17 @@ def main():
 
     try:
         module.log("Fetching Cloudflare tunnels...")
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel"
+        method = "GET"
+        module.log("REQUEST:")
+        module.log(f"{method} {url}")
         response = requests.get(
-            f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel",
+            url,
             headers=headers
         )
         response.raise_for_status()
+        module.log("\nRESPONSE:")
+        module.log(f"Response: {response.text}")
         tunnels = response.json()
         module.log(f"Retrieved tunnels: {tunnels}")
     except requests.exceptions.RequestException as e:
@@ -47,15 +53,23 @@ def main():
     if not target_tunnel:
         try:
             module.log(f"Tunnel {tunnel_name} not found, creating new tunnel...")
-            create_tunnel_response = requests.post(
-                f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel",
-                headers=headers,
-                json={
+            url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel",
+            method = "POST"
+            module.log("REQUEST:")
+            body={
                     "name": tunnel_name,
                     "config_src": "local"
                 }
+            module.log(f"{method} {url}")
+            module.log(body)
+            create_tunnel_response = requests.post(
+                url,
+                headers=headers,
+                json=body
             )
             create_tunnel_response.raise_for_status()
+            module.log("\nRESPONSE:")
+            module.log(f"Response: {response.text}")
             target_tunnel = create_tunnel_response.json()['result']
             module.log(f"Created new tunnel: {target_tunnel}")
         except requests.exceptions.RequestException as e:
