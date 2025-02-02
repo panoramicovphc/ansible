@@ -53,7 +53,7 @@ def main():
         write_log(log_file, module, f"Retrieved tunnels: {tunnels}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, f"Response: {e.response.text if e.response else 'No response'}")
+        write_log(log_file, module, f"Response: {e.response}")
         module.fail_json(msg=f"Failed to fetch tunnels: {str(e)}")
 
     try:
@@ -87,7 +87,7 @@ def main():
             write_log(log_file, module, f"Created new tunnel: {target_tunnel}")
         except requests.exceptions.RequestException as e:
             write_log(log_file, module, "\nRESPONSE:")
-            write_log(log_file, module, f"Response: {e.response.text if e.response else 'No response'}")
+            write_log(log_file, module, f"Response: {e.response}")
             module.fail_json(msg=f"Failed to create tunnel: {str(e)}")
 
     tunnel_id = target_tunnel['id']
@@ -110,7 +110,7 @@ def main():
         write_log(log_file, module, f"Tunnel configuration: {tunnel_config}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, f"Response: {e.response.text if e.response else 'No response'}")
+        write_log(log_file, module, f"Response: {e.response}")
         module.fail_json(msg=f"Failed to fetch tunnel configuration: {str(e)}")
 
     try:
