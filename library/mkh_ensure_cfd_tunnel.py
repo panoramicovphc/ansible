@@ -129,7 +129,10 @@ def main():
             write_log(log_file, module, f"{method} {url}")
             ingress_body = {
                 "config": {
-                    "ingress": tunnel_config['result']['config']['ingress'] + [
+                    "ingress": [
+                        item for item in tunnel_config['result']['config']['ingress']
+                        if item['service'] != 'http_status:404'
+                    ] + [
                         {
                             "service": private_service,
                             "hostname": public_hostname
