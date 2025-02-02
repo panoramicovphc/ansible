@@ -140,7 +140,7 @@ def main():
                     ]
                 }
             }
-            write_log(log_file, module, ingress_body)
+            write_log(log_file, module, str(ingress_body))
 
             add_ingress_response = requests.put(
                 url,
