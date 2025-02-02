@@ -135,7 +135,8 @@ def main():
                     ] + [
                         {
                             "service": private_service,
-                            "hostname": public_hostname
+                            "hostname": public_hostname,
+                            "originRequest": {}
                         },
                         {
                             "service": "http_status:404"
