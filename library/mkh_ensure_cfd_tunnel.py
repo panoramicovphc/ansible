@@ -53,7 +53,7 @@ def main():
         write_log(log_file, module, f"Retrieved tunnels: {tunnels}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, e.response)
+        write_log(log_file, module, str(e.response))
         module.fail_json(msg=f"Failed to fetch tunnels: {str(e)}")
 
     try:
@@ -87,7 +87,7 @@ def main():
             write_log(log_file, module, f"Created new tunnel: {str(target_tunnel)}")
         except requests.exceptions.RequestException as e:
             write_log(log_file, module, "\nRESPONSE:")
-            write_log(log_file, module, e.response)
+            write_log(log_file, module, str(e.response))
             module.fail_json(msg=f"Failed to create tunnel: {str(e)}")
 
     tunnel_id = target_tunnel['id']
@@ -110,7 +110,7 @@ def main():
         write_log(log_file, module, f"Tunnel configuration: {str(tunnel_config)}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, e.response)
+        write_log(log_file, module, str(e.response))
         module.fail_json(msg=f"Failed to fetch tunnel configuration: {str(e)}")
 
     try:
@@ -150,10 +150,10 @@ def main():
             add_ingress_response.raise_for_status()
             write_log(log_file, module, "\nRESPONSE:")
             write_log(log_file, module, f"Response: {add_ingress_response.text}")
-            write_log(log_file, module, f"Added ingress configuration: {ingress_body}")
+            write_log(log_file, module, f"Added ingress configuration: {str(ingress_body)}")
         except requests.exceptions.RequestException as e:
             write_log(log_file, module, "\nRESPONSE:")
-            write_log(log_file, module, e.response)
+            write_log(log_file, module, str(e.response))
             module.fail_json(msg=f"Failed to add ingress configuration: {str(e)}")
 
     module.exit_json(changed=True, tunnel_id=tunnel_id)
