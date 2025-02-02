@@ -16,6 +16,7 @@ def main():
         tunnel_name=dict(type='str', required=True),
         private_service=dict(type='str', required=True),
         public_hostname=dict(type='str', required=True),
+        zone_id=dict(type='str', required=True),
         log_file=dict(type='str', required=False, default='/tmp/mkh_ensure_fcd_tunnel.log')
     )
 
@@ -29,6 +30,7 @@ def main():
     tunnel_name = module.params['tunnel_name']
     private_service = module.params['private_service']
     public_hostname = module.params['public_hostname']
+    zone_id = module.params['zone_id']
     log_file = module.params['log_file']
 
     headers = {
@@ -91,6 +93,7 @@ def main():
             module.fail_json(msg=f"Failed to create tunnel: {str(e)}")
 
     tunnel_id = target_tunnel['id']
+    dns_argotunnel = f"{tunnel_id}.cfargotunnel.com"
     write_log(log_file, module, f"Tunnel ID: {tunnel_id}")
 
     try:
@@ -159,6 +162,85 @@ def main():
             write_log(log_file, module, "\nRESPONSE:")
             write_log(log_file, module, str(e.response))
             module.fail_json(msg=f"Failed to add ingress configuration: {str(e)}")
+
+    try:
+        write_log(log_file, module, "Fetching DNS records...")
+        url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records"
+        method = "GET"
+        write_log(log_file, module, "REQUEST:")
+        write_log(log_file, module, f"{method} {url}")
+        dns_response = requests.get(
+            url,
+            headers=headers
+        )
+        dns_response.raise_for_status()
+        write_log(log_file, module, "\nRESPONSE:")
+        write_log(log_file, module, f"Response: {dns_response.text}")
+        dns_records = dns_response.json()
+        write_log(log_file, module, f"Retrieved DNS records: {dns_records}")
+    except requests.exceptions.RequestException as e:
+        write_log(log_file, module, "\nRESPONSE:")
+        write_log(log_file, module, str(e.response))
+        module.fail_json(msg=f"Failed to fetch DNS records: {str(e)}")
+
+    try:
+        write_log(log_file, module, f"Searching for DNS record named {public_hostname}...")
+        target_dns_record = next((item for item in dns_records['result'] if item['name'] == public_hostname), None)
+        write_log(log_file, module, f"Target DNS record: {target_dns_record}")
+    except Exception as e:
+        module.fail_json(msg=f"Failed to find DNS record: {str(e)}")
+
+    if target_dns_record:
+        dns_record_id = target_dns_record['id']
+        write_log(log_file, module, f"DNS Record ID: {dns_record_id}")
+        if target_dns_record['type'] != 'CNAME' or target_dns_record['content'] != dns_argotunnel:
+            try:
+                write_log(log_file, module, f"DNS record is not a CNAME pointing to {tunnel_id}.cfargotunnel.com, deleting DNS record...")
+                url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{dns_record_id}"
+                method = "DELETE"
+                write_log(log_file, module, "REQUEST:")
+                write_log(log_file, module, f"{method} {url}")
+                delete_dns_response = requests.delete(
+                    url,
+                    headers=headers
+                )
+                delete_dns_response.raise_for_status()
+                write_log(log_file, module, "\nRESPONSE:")
+                write_log(log_file, module, f"Response: {delete_dns_response.text}")
+                write_log(log_file, module, f"Deleted DNS record: {dns_record_id}")
+            except requests.exceptions.RequestException as e:
+                write_log(log_file, module, "\nRESPONSE:")
+                write_log(log_file, module, str(e.response))
+                module.fail_json(msg=f"Failed to delete DNS record: {str(e)}")
+
+    if not target_dns_record or (target_dns_record and (target_dns_record['type'] != 'CNAME' or target_dns_record['content'] != dns_argotunnel)):
+        try:
+            write_log(log_file, module, f"Creating DNS record for {public_hostname}...")
+            url = f"https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records"
+            method = "POST"
+            write_log(log_file, module, "REQUEST:")
+            dns_body = {
+                'type': 'CNAME',
+                'name': public_hostname,
+                'content': dns_argotunnel,
+                'ttl': 1,
+                'proxied': True
+            }
+            write_log(log_file, module, f"{method} {url}")
+            write_log(log_file, module, str(dns_body))
+            create_dns_response = requests.post(
+                url,
+                headers=headers,
+                json=dns_body
+            )
+            create_dns_response.raise_for_status()
+            write_log(log_file, module, "\nRESPONSE:")
+            write_log(log_file, module, f"Response: {create_dns_response.text}")
+            write_log(log_file, module, f"Created DNS record: {str(dns_body)}")
+        except requests.exceptions.RequestException as e:
+            write_log(log_file, module, "\nRESPONSE:")
+            write_log(log_file, module, str(e.response))
+            module.fail_json(msg=f"Failed to create DNS record: {str(e)}")
 
     module.exit_json(changed=True, tunnel_id=tunnel_id)
 
