@@ -23,6 +23,7 @@
         format: "zip"
         exclude_path:
           - "{{ lookup('env', 'ANSIBLE_PROJECT') }}/_dropfolder"
+          - "{{ lookup('env', 'ANSIBLE_PROJECT') }}/.git"
 
 - name: "Clean and propagate Ansible project to remote nodes"
   hosts: "all"

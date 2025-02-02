@@ -70,6 +70,7 @@ jobs:
           sudo chmod 0755 ${ANSIBLE_PROJECT}
           sudo cp -r . ${ANSIBLE_PROJECT}/
           sudo rm -rf ${ANSIBLE_PROJECT}/.github
+          sudo rm -rf ${ANSIBLE_PROJECT}/.git
       - name: "Setup Ansible dependencies"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
