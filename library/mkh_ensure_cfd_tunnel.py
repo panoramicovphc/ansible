@@ -48,12 +48,12 @@ def main():
         )
         response.raise_for_status()
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, f"Response: {response.text}")
+        write_log(log_file, module, response.text)
         tunnels = response.json()
         write_log(log_file, module, f"Retrieved tunnels: {tunnels}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, f"Response: {e.response}")
+        write_log(log_file, module, e.response)
         module.fail_json(msg=f"Failed to fetch tunnels: {str(e)}")
 
     try:
@@ -87,7 +87,7 @@ def main():
             write_log(log_file, module, f"Created new tunnel: {target_tunnel}")
         except requests.exceptions.RequestException as e:
             write_log(log_file, module, "\nRESPONSE:")
-            write_log(log_file, module, f"Response: {e.response}")
+            write_log(log_file, module, e.response)
             module.fail_json(msg=f"Failed to create tunnel: {str(e)}")
 
     tunnel_id = target_tunnel['id']
@@ -110,7 +110,7 @@ def main():
         write_log(log_file, module, f"Tunnel configuration: {tunnel_config}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, f"Response: {e.response}")
+        write_log(log_file, module, e.response)
         module.fail_json(msg=f"Failed to fetch tunnel configuration: {str(e)}")
 
     try:
@@ -123,6 +123,10 @@ def main():
     if not ingress_exists:
         try:
             write_log(log_file, module, "Ingress does not exist, adding ingress configuration...")
+            url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations"
+            method = "PUT"
+            write_log(log_file, module, "REQUEST:")
+            write_log(log_file, module, f"{method} {url}")
             ingress_body = {
                 "config": {
                     "ingress": tunnel_config['result']['config']['ingress'] + [
@@ -136,15 +140,20 @@ def main():
                     ]
                 }
             }
+            write_log(log_file, module, ingress_body)
 
             add_ingress_response = requests.put(
-                f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations",
+                url,
                 headers=headers,
                 json=ingress_body
             )
             add_ingress_response.raise_for_status()
+            write_log(log_file, module, "\nRESPONSE:")
+            write_log(log_file, module, f"Response: {add_ingress_response.text}")
             write_log(log_file, module, f"Added ingress configuration: {ingress_body}")
         except requests.exceptions.RequestException as e:
+            write_log(log_file, module, "\nRESPONSE:")
+            write_log(log_file, module, e.response)
             module.fail_json(msg=f"Failed to add ingress configuration: {str(e)}")
 
     module.exit_json(changed=True, tunnel_id=tunnel_id)
