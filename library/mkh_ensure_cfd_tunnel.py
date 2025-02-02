@@ -105,7 +105,7 @@ def main():
         )
         tunnel_config_response.raise_for_status()
         write_log(log_file, module, "\nRESPONSE:")
-        write_log(log_file, module, f"Response: {create_tunnel_response.text}")
+        write_log(log_file, module, f"Response: {tunnel_config_response.text}")
         tunnel_config = tunnel_config_response.json()
         write_log(log_file, module, f"Tunnel configuration: {tunnel_config}")
     except requests.exceptions.RequestException as e:
