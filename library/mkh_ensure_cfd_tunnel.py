@@ -84,7 +84,7 @@ def main():
             write_log(log_file, module, "\nRESPONSE:")
             write_log(log_file, module, f"Response: {create_tunnel_response.text}")
             target_tunnel = create_tunnel_response.json()['result']
-            write_log(log_file, module, f"Created new tunnel: {target_tunnel}")
+            write_log(log_file, module, f"Created new tunnel: {str(target_tunnel)}")
         except requests.exceptions.RequestException as e:
             write_log(log_file, module, "\nRESPONSE:")
             write_log(log_file, module, e.response)
@@ -107,7 +107,7 @@ def main():
         write_log(log_file, module, "\nRESPONSE:")
         write_log(log_file, module, f"Response: {tunnel_config_response.text}")
         tunnel_config = tunnel_config_response.json()
-        write_log(log_file, module, f"Tunnel configuration: {tunnel_config}")
+        write_log(log_file, module, f"Tunnel configuration: {str(tunnel_config)}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
         write_log(log_file, module, e.response)
@@ -116,7 +116,7 @@ def main():
     try:
         write_log(log_file, module, "Checking if ingress exists...")
         ingress_exists = next((item for item in tunnel_config['result']['config']['ingress'] if item['service'] == private_service and item['hostname'] == public_hostname), None)
-        write_log(log_file, module, f"Ingress exists: {ingress_exists}")
+        write_log(log_file, module, f"Ingress exists: {str(ingress_exists)}")
     except Exception as e:
         module.fail_json(msg=f"Failed to check ingress: {str(e)}")
 
