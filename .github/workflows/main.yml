@@ -59,6 +59,9 @@ jobs:
             timestamp=$(date +"%Y%m%d%H%M%S")
             sudo tar -czvf \
               ${ANSIBLE_PROJECT}_backup/ansible_backup_$timestamp.zip \
+              --exclude=${ANSIBLE_PROJECT}/_dropfolder \
+              --exclude=${ANSIBLE_PROJECT}/.github \
+              --exclude=${ANSIBLE_PROJECT}/.git \
               ${ANSIBLE_PROJECT}
           else
             echo "Directory ${ANSIBLE_PROJECT} does not exist."
