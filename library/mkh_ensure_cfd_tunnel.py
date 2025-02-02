@@ -95,7 +95,7 @@ def main():
 
     try:
         write_log(log_file, module, "Fetching tunnel configuration...")
-        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations",
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations"
         method = "GET"
         write_log(log_file, module, "REQUEST:")
         write_log(log_file, module, f"{method} {url}")
