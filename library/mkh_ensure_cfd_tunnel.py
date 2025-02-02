@@ -91,11 +91,17 @@ def main():
 
     try:
         write_log(log_file, module, "Fetching tunnel configuration...")
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations",
+        method = "GET"
+        write_log(log_file, module, "REQUEST:")
+        write_log(log_file, module, f"{method} {url}")
         tunnel_config_response = requests.get(
-            f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations",
+            url,
             headers=headers
         )
         tunnel_config_response.raise_for_status()
+        write_log(log_file, module, "\nRESPONSE:")
+        write_log(log_file, module, f"Response: {create_tunnel_response.text}")
         tunnel_config = tunnel_config_response.json()
         write_log(log_file, module, f"Tunnel configuration: {tunnel_config}")
     except requests.exceptions.RequestException as e:
