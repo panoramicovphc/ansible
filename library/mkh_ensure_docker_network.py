@@ -31,13 +31,15 @@ def create_network(name, driver, subnet, gateway, ip_range, aux_address, options
 
 def main():
     module_args = dict(
-        name=dict(type='str', required=True),
-        driver=dict(type='str', required=False, default=None),
-        subnet=dict(type='str', required=False, default=None),
-        gateway=dict(type='str', required=False, default=None),
-        ip_range=dict(type='str', required=False, default=None),
-        aux_address=dict(type='dict', required=False, default=None),
-        options=dict(type='dict', required=False, default=None)
+        networks=dict(type='list', elements='dict', options=dict(
+            name=dict(type='str', required=True),
+            driver=dict(type='str', required=False, default=None),
+            subnet=dict(type='str', required=False, default=None),
+            gateway=dict(type='str', required=False, default=None),
+            ip_range=dict(type='str', required=False, default=None),
+            aux_address=dict(type='dict', required=False, default=None),
+            options=dict(type='dict', required=False, default=None)
+        ))
     )
 
     module = AnsibleModule(
@@ -45,25 +47,38 @@ def main():
         supports_check_mode=True
     )
 
-    name = module.params['name']
-    driver = module.params['driver']
-    subnet = module.params['subnet']
-    gateway = module.params['gateway']
-    ip_range = module.params['ip_range']
-    aux_address = module.params['aux_address']
-    options = module.params['options']
+    networks = module.params['networks']
+    results = []
 
-    if module.check_mode:
-        module.exit_json(changed=False)
+    for net in networks:
+        name = net['name']
+        driver = net.get('driver')
+        subnet = net.get('subnet')
+        gateway = net.get('gateway')
+        ip_range = net.get('ip_range')
+        aux_address = net.get('aux_address')
+        options = net.get('options')
 
-    if network_exists(name):
-        module.exit_json(changed=False, msg=f"Network {name} already exists")
+        if network_exists(name):
+            results.append({
+                'name': name,
+                'changed': False,
+                'msg': f'Network {name} already exists'
+            })
+        else:
+            success, stdout, stderr = create_network(name, driver, subnet, gateway, ip_range, aux_address, options)
+            if success:
+                results.append({
+                    'name': name,
+                    'changed': True,
+                    'msg': f'Network {name} created successfully',
+                    'stdout': stdout,
+                    'stderr': stderr
+                })
+            else:
+                module.fail_json(msg=f'Failed to create network {name}', stdout=stdout, stderr=stderr)
 
-    changed, stdout, stderr = create_network(name, driver, subnet, gateway, ip_range, aux_address, options)
-    if changed:
-        module.exit_json(changed=True, msg=f"Network {name} created", stdout=stdout)
-    else:
-        module.fail_json(msg=f"Failed to create network {name}", stderr=stderr)
+    module.exit_json(changed=any(result['changed'] for result in results), results=results)
 
 if __name__ == '__main__':
     main()
