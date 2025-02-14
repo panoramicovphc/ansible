@@ -2,6 +2,12 @@ name: "Publish Ansible project"
 run-name: "${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}"
 
 on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for running the workflow"
+        required: true
+        default: "Manual trigger"
   push:
     branches:
       - "main"
