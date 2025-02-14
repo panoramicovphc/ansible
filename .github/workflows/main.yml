@@ -8,9 +8,6 @@ on:
         description: "Reason for running the workflow"
         required: true
         default: "Manual trigger"
-  push:
-    branches:
-      - "main"
 
 env:
   ANSIBLE_PROJECT: ${{ vars.ANSIBLE_PROJECT }}
