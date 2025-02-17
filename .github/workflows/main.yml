@@ -3,6 +3,7 @@ run-name: "${{ github.event_name }} by ${{ github.actor }} #${{ github.run_numbe
 
 on:
   workflow_dispatch:
+    name: "Manual Trigger"
     inputs:
       reason:
         description: "Reason for running the workflow"
