@@ -1,6 +1,6 @@
-# MK-House Ansible Playbooks
+# Ansible Playbooks
 
-This repository contains Ansible playbooks for setting up and managing the infrastructure of a homelab environment. The project is part of a broader Infrastructure as Code (IaC) initiative aimed at automating the deployment and management of various services and applications.
+This repository contains Ansible playbooks for setting up and managing the infrastructure of various environments. The project is part of a broader Infrastructure as Code (IaC) initiative aimed at automating the deployment and management of various services and applications.
 
 ## Overview
 
@@ -44,12 +44,11 @@ In the inventory file, you can specify which structural solutions (like RabbitMQ
 
 ```ini
 [prd]
-tankian.mkh    ansible_user=${TANKIAN_USER_LOGIN}    ansible_password=${TANKIAN_USDER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "ansible_controller", "rabbitmq" ]'
-trujillo.mkh   ansible_user=${TRUJILLO_USER_LOGIN}   ansible_password=${TRUJILLO_USDER_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TRUJILLO}   labels='[ "ansible_controller" ]'
-chuck.mkh      ansible_user=${CHUCK_USER_LOGIN}      ansible_password=${CHUCK_USDER_PASSWORD}      CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_CHUCK}      labels='[ "ansible_controller" ]'
+host1    ansible_user=${HOST1_USER_LOGIN}    ansible_password=${HOST1_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_HOST1}    labels='[ "ansible_controller", "rabbitmq" ]'
+host2    ansible_user=${HOST2_USER_LOGIN}    ansible_password=${HOST2_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_HOST2}    labels='[ "ansible_controller" ]'
 
 [pc]
-jimmy.mkh      ansible_user=${JIMMY_USER_LOGIN}      ansible_password=${JIMMY_USDER_PASSWORD}      CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_JIMMY}      labels='[ "open_webui", "tabbyml" ]'
+host3    ansible_user=${HOST3_USER_LOGIN}    ansible_password=${HOST3_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_HOST3}    labels='[ "open_webui", "tabbyml" ]'
 ```
 
 ## GitHub Actions Workflow
@@ -61,8 +60,8 @@ The `.github/workflows/main.yml` file contains a GitHub Actions workflow for aut
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/yourusername/mk-house.git
-    cd mk-house/ansible
+    git clone https://github.com/yourusername/your-repo.git
+    cd your-repo/ansible
     ```
 
 2. Customize the `inventory/hosts.ini` file with your environment variables.
@@ -70,7 +69,7 @@ The `.github/workflows/main.yml` file contains a GitHub Actions workflow for aut
 3. Set the `ANSIBLE_PROJECT` environment variable:
 
     ```bash
-    export ANSIBLE_PROJECT=/usr/local/iac/ansible
+    export ANSIBLE_PROJECT=/path/to/your/ansible/project
     ```
 
 4. Run the playbooks using Ansible:
