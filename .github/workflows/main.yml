@@ -48,6 +48,12 @@ jobs:
           fi
       - name: "Update hosts.ini dynamically"
         env:
+          CHUCK_USER_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
+          CHUCK_USER_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
+          TRUJILLO_USER_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
+          TRUJILLO_USER_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
+          TANKIAN_USER_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
+          TANKIAN_USER_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
           MKADMIN_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
           MKADMIN_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
           CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
