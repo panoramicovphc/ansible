@@ -8,7 +8,7 @@
       group_by:
         key: "label_ansible_controller"
       when: |
-        "ansible_controller" in hostvars[inventory_hostname]["labels"]
+        ansible_controller in hostvars[inventory_hostname].labels
 
 - name: "Propagate Ansible project to remote nodes"
   hosts: "label_ansible_controller"
