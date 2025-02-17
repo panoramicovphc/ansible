@@ -1,6 +1,17 @@
 ---
-- name: "Playbook to install Ansible dependencies"
+- name: "Group Ansible Controller hosts"
   hosts: "all"
+
+  tasks:
+
+    - name: "Group hosts by label"
+      group_by:
+        key: "label_ansible_controller"
+      when: |
+        "ansible_controller" in hostvars[inventory_hostname]["labels"]
+
+- name: "Playbook to install Ansible dependencies"
+  hosts: "label_ansible_controller"
   become: true
 
   tasks:

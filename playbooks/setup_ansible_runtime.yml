@@ -1,6 +1,17 @@
 ---
-- name: "Setup Ansible runtime on remote nodes"
+- name: "Group Ansible Controller hosts"
   hosts: "all"
+
+  tasks:
+
+    - name: "Group hosts by label"
+      group_by:
+        key: "label_ansible_controller"
+      when: |
+        "ansible_controller" in hostvars[inventory_hostname]["labels"]
+
+- name: "Setup Ansible runtime on remote nodes"
+  hosts: "label_ansible_controller"
   become: true
   tasks:
     - name: "Ensure the ansible-setup.sh script is executable"
