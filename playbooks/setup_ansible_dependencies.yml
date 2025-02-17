@@ -1,6 +1,7 @@
 ---
 - name: "Group Ansible Controller hosts"
   hosts: "all"
+  ignore_unreachable: true
 
   tasks:
 
