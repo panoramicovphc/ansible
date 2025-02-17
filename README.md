@@ -36,7 +36,7 @@ This playbook propagates the Ansible project to remote nodes by:
 
 ## Inventory
 
-The `inventory/hosts.ini.template` file contains the inventory configuration for the Ansible playbooks. It uses environment variables for sensitive information.
+The `inventory/hosts.ini` file contains the inventory configuration for the Ansible playbooks. It uses environment variables for sensitive information.
 
 ### Indicating Structural Solutions
 
@@ -44,9 +44,12 @@ In the inventory file, you can specify which structural solutions (like RabbitMQ
 
 ```ini
 [prd]
-tankian.mkh    ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "rabbitmq" ]'
-trujillo.mkh   ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TRUJILLO}   labels='[]'
-chuck.mkh      ansible_user=${MKADMIN_LOGIN}   ansible_password=${MKADMIN_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_CHUCK}      labels='[]'
+tankian.mkh    ansible_user=${TANKIAN_USER_LOGIN}    ansible_password=${TANKIAN_USDER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "ansible_controller", "rabbitmq" ]'
+trujillo.mkh   ansible_user=${TRUJILLO_USER_LOGIN}   ansible_password=${TRUJILLO_USDER_PASSWORD}   CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TRUJILLO}   labels='[ "ansible_controller" ]'
+chuck.mkh      ansible_user=${CHUCK_USER_LOGIN}      ansible_password=${CHUCK_USDER_PASSWORD}      CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_CHUCK}      labels='[ "ansible_controller" ]'
+
+[pc]
+jimmy.mkh      ansible_user=${JIMMY_USER_LOGIN}      ansible_password=${JIMMY_USDER_PASSWORD}      CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_JIMMY}      labels='[ "open_webui", "tabbyml" ]'
 ```
 
 ## GitHub Actions Workflow
@@ -62,7 +65,7 @@ The `.github/workflows/main.yml` file contains a GitHub Actions workflow for aut
     cd mk-house/ansible
     ```
 
-2. Customize the `inventory/hosts.ini.template` file with your environment variables.
+2. Customize the `inventory/hosts.ini` file with your environment variables.
 
 3. Set the `ANSIBLE_PROJECT` environment variable:
 

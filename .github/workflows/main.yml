@@ -48,17 +48,16 @@ jobs:
           fi
       - name: "Update hosts.ini dynamically"
         env:
-          CHUCK_USER_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
-          CHUCK_USER_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
-          TRUJILLO_USER_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
-          TRUJILLO_USER_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
-          TANKIAN_USER_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
-          TANKIAN_USER_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
-          MKADMIN_LOGIN: "${{ vars.MKADMIN_LOGIN }}"
-          MKADMIN_PASSWORD: "${{ secrets.MKADMIN_PASSWORD }}"
+          CHUCK_USER_LOGIN: "${{ vars.CHUCK_USER_LOGIN }}"
+          CHUCK_USER_PASSWORD: "${{ secrets.CHUCK_USER_PASSWORD }}"
+          TRUJILLO_USER_LOGIN: "${{ vars.TRUJILLO_USER_LOGIN }}"
+          TRUJILLO_USER_PASSWORD: "${{ secrets.TRUJILLO_USER_PASSWORD }}"
+          TANKIAN_USER_LOGIN: "${{ vars.TANKIAN_USER_LOGIN }}"
+          TANKIAN_USER_PASSWORD: "${{ secrets.TANKIAN_USER_PASSWORD }}"
           CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
           CF_TUNNEL_TOKEN_TRUJILLO: "${{ secrets.CF_TUNNEL_TOKEN_TRUJILLO }}"
           CF_TUNNEL_TOKEN_CHUCK: "${{ secrets.CF_TUNNEL_TOKEN_CHUCK }}"
+          CF_TUNNEL_TOKEN_JIMMY: "${{ secrets.CF_TUNNEL_TOKEN_JIMMY }}"
         run: |
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: "Backup Ansible project"
