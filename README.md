@@ -1,46 +1,46 @@
-# Ansible Playbooks
+# Playbooks Ansible
 
-This repository contains Ansible playbooks for setting up and managing the infrastructure of various environments. The project is part of a broader Infrastructure as Code (IaC) initiative aimed at automating the deployment and management of various services and applications.
+Este repositório contém playbooks Ansible para configurar e gerenciar a infraestrutura de diversas soluções do condomínio. O projeto faz parte de uma iniciativa mais ampla de Infraestrutura como Código (IaC) voltada para automatizar a implantação e o gerenciamento de vários serviços e aplicações.
 
-## Overview
+## Visão Geral
 
-The playbooks in this repository are designed to:
+Os playbooks neste repositório são projetados para:
 
-- Set up the Ansible runtime environment.
-- Install necessary dependencies for Ansible.
-- Propagate the Ansible project to remote nodes.
+- Configurar o ambiente de execução do Ansible.
+- Instalar as dependências necessárias para o Ansible.
+- Propagar o projeto Ansible para os nós remotos.
 
 ## Playbooks
 
 ### setup_ansible_runtime.yml
 
-This playbook sets up the Ansible runtime environment by:
+Este playbook configura o ambiente de execução do Ansible, realizando as seguintes tarefas:
 
-- Ensuring the setup script is executable.
-- Removing old log files.
-- Executing the setup script.
-- Printing the output and error logs.
+- Garantindo que o script de configuração seja executável.
+- Removendo arquivos de log antigos.
+- Executando o script de configuração.
+- Imprimindo os logs de saída e erro.
 
 ### setup_ansible_dependencies.yml
 
-This playbook installs necessary dependencies for Ansible on both Debian-based and Red Hat-based systems.
+Este playbook instala as dependências necessárias para o Ansible em sistemas baseados em Debian e Red Hat.
 
 ### propagate_ansible_project.yml
 
-This playbook propagates the Ansible project to remote nodes by:
+Este playbook propaga o projeto Ansible para os nós remotos, realizando as seguintes tarefas:
 
-- Creating backups of the current project.
-- Cleaning the destination directory.
-- Copying the project files to the remote nodes.
-- Setting appropriate permissions.
+- Criando backups do projeto atual.
+- Limpando o diretório de destino.
+- Copiando os arquivos do projeto para os nós remotos.
+- Definindo permissões apropriadas.
 
-## Inventory
+## Inventário
 
-The `inventory/hosts.ini` file contains the inventory configuration for the Ansible playbooks. It uses environment variables for sensitive information.
+O arquivo `inventory/hosts.ini` contém a configuração de inventário para os playbooks Ansible. Ele usa variáveis de ambiente para informações sensíveis.
 
-### Indicating Structural Solutions
+### Indicando Soluções Estruturais
 
-In the inventory file, you can specify which structural solutions (like RabbitMQ and Redis) will be served by each host using the `labels` attribute. This allows multiple solutions to share the same instance on a host. For example:
+No arquivo de inventário, você pode especificar quais soluções estruturais (como RabbitMQ e Redis) serão servidas por cada host usando o atributo `labels`. Isso permite que várias soluções compartilhem a mesma instância em um host. Por exemplo:
 
 ```ini
 [prd]
@@ -51,28 +51,28 @@ host2    ansible_user=${HOST2_USER_LOGIN}    ansible_password=${HOST2_USER_PASSW
 host3    ansible_user=${HOST3_USER_LOGIN}    ansible_password=${HOST3_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_HOST3}    labels='[ "open_webui", "tabbyml" ]'
 ```
 
-## GitHub Actions Workflow
+## Fluxo de Trabalho do GitHub Actions
 
-The `.github/workflows/main.yml` file contains a GitHub Actions workflow for automating the deployment of the Ansible project. It includes steps for setting up the runtime environments, installing dependencies, and propagating the project.
+O arquivo `.github/workflows/main.yml` contém um fluxo de trabalho do GitHub Actions para automatizar a implantação do projeto Ansible. Inclui etapas para configurar os ambientes de execução, instalar dependências e propagar o projeto.
 
-## Usage
+## Uso
 
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/yourusername/your-repo.git
-    cd your-repo/ansible
-    ```
-
-2. Customize the `inventory/hosts.ini` file with your environment variables.
-
-3. Set the `ANSIBLE_PROJECT` environment variable:
+1. Clone o repositório:
 
     ```bash
-    export ANSIBLE_PROJECT=/path/to/your/ansible/project
+    git clone https://github.com/seuusuario/seu-repo.git
+    cd seu-repo/ansible
     ```
 
-4. Run the playbooks using Ansible:
+2. Personalize o arquivo `inventory/hosts.ini` com suas variáveis de ambiente.
+
+3. Defina a variável de ambiente `ANSIBLE_PROJECT`:
+
+    ```bash
+    export ANSIBLE_PROJECT=/caminho/para/seu/projeto/ansible
+    ```
+
+4. Execute os playbooks usando Ansible:
 
     ```bash
     ansible-playbook -i inventory/hosts.ini playbooks/setup_ansible_runtime.yml
@@ -80,10 +80,10 @@ The `.github/workflows/main.yml` file contains a GitHub Actions workflow for aut
     ansible-playbook -i inventory/hosts.ini playbooks/propagate_ansible_project.yml
     ```
 
-## Contributing
+## Contribuindo
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
+Contribuições são bem-vindas! Por favor, faça um fork do repositório e envie um pull request com suas alterações.
 
-## License
+## Licença
 
-This project is licensed under the MIT License. See the [LICENSE](../LICENSE) file for details.
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](../LICENSE) para mais detalhes.
