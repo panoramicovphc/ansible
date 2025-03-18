@@ -45,6 +45,7 @@ def main():
         method = "GET"
         write_log(log_file, module, "REQUEST:")
         write_log(log_file, module, f"{method} {url}")
+        write_log(log_file, module, f"HEADERS: {headers}")
         response = requests.get(
             url,
             headers=headers
@@ -77,6 +78,7 @@ def main():
                 "config_src": "local"
             }
             write_log(log_file, module, f"{method} {url}")
+            write_log(log_file, module, f"HEADERS: {headers}")
             write_log(log_file, module, str(body))
             create_tunnel_response = requests.post(
                 url,
@@ -103,6 +105,7 @@ def main():
         method = "GET"
         write_log(log_file, module, "REQUEST:")
         write_log(log_file, module, f"{method} {url}")
+        write_log(log_file, module, f"HEADERS: {headers}")
         tunnel_config_response = requests.get(
             url,
             headers=headers
@@ -147,6 +150,7 @@ def main():
         method = "PUT"
         write_log(log_file, module, "REQUEST:")
         write_log(log_file, module, f"{method} {url}")
+        write_log(log_file, module, f"HEADERS: {headers}")
 
         ingress_body = {
             "config": {
@@ -188,6 +192,7 @@ def main():
         method = "GET"
         write_log(log_file, module, "REQUEST:")
         write_log(log_file, module, f"{method} {url}")
+        write_log(log_file, module, f"HEADERS: {headers}")
         dns_response = requests.get(
             url,
             headers=headers
@@ -219,6 +224,7 @@ def main():
                 method = "DELETE"
                 write_log(log_file, module, "REQUEST:")
                 write_log(log_file, module, f"{method} {url}")
+                write_log(log_file, module, f"HEADERS: {headers}")
                 delete_dns_response = requests.delete(
                     url,
                     headers=headers
@@ -246,6 +252,7 @@ def main():
                 'proxied': True
             }
             write_log(log_file, module, f"{method} {url}")
+            write_log(log_file, module, f"HEADERS: {headers}")
             write_log(log_file, module, str(dns_body))
             create_dns_response = requests.post(
                 url,
