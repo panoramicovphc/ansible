@@ -118,8 +118,12 @@ def main():
 
     try:
         write_log(log_file, module, "Checking if ingress exists...")
-        ingress_exists = next((item for item in tunnel_config['result']['config']['ingress'] if item['service'] == private_service and item['hostname'] == public_hostname), None)
-        write_log(log_file, module, f"Ingress exists: {str(ingress_exists)}")
+        if 'result' in tunnel_config and 'config' in tunnel_config['result'] and 'ingress' in tunnel_config['result']['config']:
+            ingress_exists = next((item for item in tunnel_config['result']['config']['ingress'] if item['service'] == private_service and item['hostname'] == public_hostname), None)
+            write_log(log_file, module, f"Ingress exists: {str(ingress_exists)}")
+        else:
+            ingress_exists = None
+            write_log(log_file, module, "Ingress configuration not found in tunnel configuration.")
     except Exception as e:
         module.fail_json(msg=f"Failed to check ingress: {str(e)}")
 
