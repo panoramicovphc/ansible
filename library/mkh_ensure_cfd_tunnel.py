@@ -118,7 +118,9 @@ def main():
 
     try:
         write_log(log_file, module, "Checking if ingress exists...")
-        if 'result' in tunnel_config and 'config' in tunnel_config['result'] and 'ingress' in tunnel_config['result']['config']:
+        if 'result' in tunnel_config and tunnel_config['result'] is not None and \
+           'config' in tunnel_config['result'] and tunnel_config['result']['config'] is not None and \
+           'ingress' in tunnel_config['result']['config'] and tunnel_config['result']['config']['ingress'] is not None:
             ingress_exists = next((item for item in tunnel_config['result']['config']['ingress'] if item['service'] == private_service and item['hostname'] == public_hostname), None)
             write_log(log_file, module, f"Ingress exists: {str(ingress_exists)}")
         else:
