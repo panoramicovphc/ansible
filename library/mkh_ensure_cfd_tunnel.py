@@ -118,14 +118,29 @@ def main():
 
     try:
         write_log(log_file, module, "Checking if ingress exists...")
-        if 'result' in tunnel_config and tunnel_config['result'] is not None and \
-           'config' in tunnel_config['result'] and tunnel_config['result']['config'] is not None and \
-           'ingress' in tunnel_config['result']['config']:
-            ingress_exists = next((item for item in tunnel_config['result']['config']['ingress'] if item['service'] == private_service and item['hostname'] == public_hostname), None)
-            write_log(log_file, module, f"Ingress exists: {str(ingress_exists)}")
-        else:
-            ingress_exists = None
-            write_log(log_file, module, "Ingress configuration not found in tunnel configuration.")
+
+        if 'result' not in tunnel_config:
+            write_log(log_file, module, "Key 'result' not found in tunnel_config.")
+            module.fail_json(msg="Key 'result' not found in tunnel_config.")
+        if tunnel_config['result'] is None:
+            write_log(log_file, module, "'result' in tunnel_config is None.")
+            module.fail_json(msg="'result' in tunnel_config is None.")
+        if 'config' not in tunnel_config['result']:
+            write_log(log_file, module, "Key 'config' not found in tunnel_config['result'].")
+            module.fail_json(msg="Key 'config' not found in tunnel_config['result'].")
+        if tunnel_config['result']['config'] is None:
+            write_log(log_file, module, "'config' in tunnel_config['result'] is None.")
+            module.fail_json(msg="'config' in tunnel_config['result'] is None.")
+        if 'ingress' not in tunnel_config['result']['config']:
+            write_log(log_file, module, "Key 'ingress' not found in tunnel_config['result']['config'].")
+            module.fail_json(msg="Key 'ingress' not found in tunnel_config['result']['config'].")
+        if tunnel_config['result']['config']['ingress'] is None:
+            write_log(log_file, module, "'ingress' in tunnel_config['result']['config'] is None.")
+            module.fail_json(msg="'ingress' in tunnel_config['result']['config'] is None.")
+
+        ingress_exists = next((item for item in tunnel_config['result']['config']['ingress'] if item['service'] == private_service and item['hostname'] == public_hostname), None)
+        write_log(log_file, module, f"Ingress exists: {str(ingress_exists)}")
+
     except Exception as e:
         module.fail_json(msg=f"Failed to check ingress: {str(e)}")
 
