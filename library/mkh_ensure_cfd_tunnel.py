@@ -3,6 +3,7 @@
 from ansible.module_utils.basic import AnsibleModule
 import requests
 import os
+import json  # Adicione esta importação
 
 def write_log(log_file, module, message):
     with open(log_file, 'a') as f:
@@ -164,17 +165,18 @@ def main():
                 ]
             }
         }
-        write_log(log_file, module, str(ingress_body))
+        ingress_body_json = json.dumps(ingress_body)
+        write_log(log_file, module, ingress_body_json)
 
         add_ingress_response = requests.put(
             url,
             headers=headers,
-            json=ingress_body
+            data=ingress_body_json
         )
         add_ingress_response.raise_for_status()
         write_log(log_file, module, "\nRESPONSE:")
         write_log(log_file, module, f"Response: {add_ingress_response.text}")
-        write_log(log_file, module, f"Added ingress configuration: {str(ingress_body)}")
+        write_log(log_file, module, f"Added ingress configuration: {ingress_body_json}")
     except requests.exceptions.RequestException as e:
         write_log(log_file, module, "\nRESPONSE:")
         write_log(log_file, module, str(e.response))
