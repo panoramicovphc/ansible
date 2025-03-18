@@ -136,47 +136,49 @@ def main():
         module.fail_json(msg=f"Failed to check ingress: {str(e)}")
 
     if not ingress_exists:
-        try:
-            write_log(log_file, module, "Ingress does not exist, adding ingress configuration...")
-            url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations"
-            method = "PUT"
-            write_log(log_file, module, "REQUEST:")
-            write_log(log_file, module, f"{method} {url}")
+        ingress_list = []
+    else:
+        ingress_list = tunnel_config['result']['config']['ingress']
 
-            ingress_list = tunnel_config['result']['config']['ingress'] if 'ingress' in tunnel_config['result']['config'] and tunnel_config['result']['config']['ingress'] is not None else []
+    try:
+        write_log(log_file, module, "Ingress does not exist, adding ingress configuration...")
+        url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/cfd_tunnel/{tunnel_id}/configurations"
+        method = "PUT"
+        write_log(log_file, module, "REQUEST:")
+        write_log(log_file, module, f"{method} {url}")
 
-            ingress_body = {
-                "config": {
-                    "ingress": [
-                        item for item in ingress_list
-                        if item['service'] != 'http_status:404'
-                    ] + [
-                        {
-                            "service": private_service,
-                            "hostname": public_hostname,
-                            "originRequest": {}
-                        },
-                        {
-                            "service": "http_status:404"
-                        }
-                    ]
-                }
+        ingress_body = {
+            "config": {
+                "ingress": [
+                    item for item in ingress_list
+                    if item['service'] != 'http_status:404'
+                ] + [
+                    {
+                        "service": private_service,
+                        "hostname": public_hostname,
+                        "originRequest": {}
+                    },
+                    {
+                        "service": "http_status:404"
+                    }
+                ]
             }
-            write_log(log_file, module, str(ingress_body))
+        }
+        write_log(log_file, module, str(ingress_body))
 
-            add_ingress_response = requests.put(
-                url,
-                headers=headers,
-                json=ingress_body
-            )
-            add_ingress_response.raise_for_status()
-            write_log(log_file, module, "\nRESPONSE:")
-            write_log(log_file, module, f"Response: {add_ingress_response.text}")
-            write_log(log_file, module, f"Added ingress configuration: {str(ingress_body)}")
-        except requests.exceptions.RequestException as e:
-            write_log(log_file, module, "\nRESPONSE:")
-            write_log(log_file, module, str(e.response))
-            module.fail_json(msg=f"Failed to add ingress configuration: {str(e)}")
+        add_ingress_response = requests.put(
+            url,
+            headers=headers,
+            json=ingress_body
+        )
+        add_ingress_response.raise_for_status()
+        write_log(log_file, module, "\nRESPONSE:")
+        write_log(log_file, module, f"Response: {add_ingress_response.text}")
+        write_log(log_file, module, f"Added ingress configuration: {str(ingress_body)}")
+    except requests.exceptions.RequestException as e:
+        write_log(log_file, module, "\nRESPONSE:")
+        write_log(log_file, module, str(e.response))
+        module.fail_json(msg=f"Failed to add ingress configuration: {str(e)}")
 
     try:
         write_log(log_file, module, "Fetching DNS records...")
