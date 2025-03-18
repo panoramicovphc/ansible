@@ -142,10 +142,13 @@ def main():
             method = "PUT"
             write_log(log_file, module, "REQUEST:")
             write_log(log_file, module, f"{method} {url}")
+
+            ingress_list = tunnel_config['result']['config']['ingress'] if 'ingress' in tunnel_config['result']['config'] and tunnel_config['result']['config']['ingress'] is not None else []
+
             ingress_body = {
                 "config": {
                     "ingress": [
-                        item for item in tunnel_config['result']['config']['ingress']
+                        item for item in ingress_list
                         if item['service'] != 'http_status:404'
                     ] + [
                         {
