@@ -33,13 +33,13 @@ jobs:
           ls -la
       - name: "Build artifact"
         run: |
-          tar --exclude=".git" --exclude=".github" -czf $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz .
+          tar --exclude=".git" --exclude=".github" -czf ${RUNNER_TEMP}/artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz .
       - name: "List artifact"
         run: |
-          ls -la $RUNNER_TEMP
+          ls -la ${RUNNER_TEMP}
       - name: "Upload artifact"
         uses: "actions/upload-artifact@v4"
         with:
-          name: ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}
+          name: "artifact-v${{ github.run_number }}.${{ github.run_attempt }}"
           if-no-files-found: error
-          path: $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz
+          path: ${RUNNER_TEMP}/artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz
