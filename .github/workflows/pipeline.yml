@@ -32,7 +32,7 @@ jobs:
         run: |
           tar --exclude=".git" --exclude=".github" -czf $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz .
       - name: "Upload artifact"
-        uses: "actions/upload-artifact@v3.1.1"
+        uses: "@actions/artifact"
         with:
           name: ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}
           path: $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz
