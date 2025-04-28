@@ -30,4 +30,9 @@ jobs:
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: "Publish artifact"
         run: |
-          tar --exclude=".git" --exclude=".github" -czf artifact.tar.gz .
+          tar --exclude=".git" --exclude=".github" -czf $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz .
+      - name: "Upload artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          name: ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}
+          path: $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz
