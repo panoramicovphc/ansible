@@ -1,0 +1,33 @@
+name: "Publish Ansible project"
+run-name: "${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}"
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for running the workflow"
+        required: true
+        default: "Manual trigger"
+
+jobs:
+
+  publish-artifact:
+    name: "Build & Publish Artifacts"
+    runs-on: [ "ubuntu-24.04" ]
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v2"
+      - name: "Build hosts.ini"
+        env:
+          TANKIAN_USER_LOGIN: "${{ vars.TANKIAN_USER_LOGIN }}"
+          TANKIAN_USER_PASSWORD: "${{ secrets.TANKIAN_USER_PASSWORD }}"
+          CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
+        run: |
+          envsubst < inventory/hosts.ini.template > inventory/hosts.ini
+      - name: "Publish artifact"
+        run: |
+          tar --exclude=".git" --exclude=".github" -czf artifact.tar.gz .
