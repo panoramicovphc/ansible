@@ -28,6 +28,9 @@ jobs:
           CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
         run: |
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
+      - name: "List artifact"
+        run: |
+          la -la
       - name: "Build artifact"
         run: |
           tar --exclude=".git" --exclude=".github" -czf $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz .
