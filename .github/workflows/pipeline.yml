@@ -30,7 +30,7 @@ jobs:
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: "List artifact"
         run: |
-          la -la
+          ls -la
       - name: "Build artifact"
         run: |
           tar --exclude=".git" --exclude=".github" -czf $RUNNER_TEMP/ansible-artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz .
