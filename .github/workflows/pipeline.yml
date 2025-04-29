@@ -1,4 +1,4 @@
-name: "Publish Ansible project"
+name: "pipeline"
 run-name: "${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}"
 
 on:
@@ -16,7 +16,7 @@ on:
 jobs:
 
   publish-artifact:
-    name: "Build & Publish Artifacts"
+    name: "build-and-publish-artifact"
     runs-on: [ "ubuntu-24.04" ]
     steps:
       - name: "Checkout repository"
