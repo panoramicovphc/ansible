@@ -44,7 +44,7 @@ jobs:
           tar --exclude=".git" --exclude=".github" -czf ${{ env.artifact_path }} .
       - name: "Verify artifact"
         run: |
-          if [ ! -f ${${{ env.artifact_path }} ]; then
+          if [ ! -f ${{ env.artifact_path }} ]; then
             echo "Artifact was not created successfully."
             exit 1
           fi
