@@ -57,7 +57,7 @@ jobs:
 
   deploy-artifact:
     name: "deploy-dev"
-    runs-on: [ "self-hosted", "develop" ]
+    runs-on: [ "self-hosted", "development" ]
     needs: [ "publish-artifact" ]
     steps:
       - name: "Download artifact"
