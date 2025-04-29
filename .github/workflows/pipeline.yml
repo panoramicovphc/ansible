@@ -57,7 +57,7 @@ jobs:
 
   deploy-artifact:
     name: "deploy-dev"
-    runs-on: [ "self-hosted", "ubuntu-24.04", "develop" ]
+    runs-on: [ "self-hosted", "develop" ]
     needs: [ "publish-artifact" ]
     steps:
       - name: "Download artifact"
