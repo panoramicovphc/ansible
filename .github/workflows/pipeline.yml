@@ -54,3 +54,14 @@ jobs:
           name: ${{ env.artifact_name }}
           if-no-files-found: error
           path: ${{ env.artifact_path }}
+
+  deploy-artifact:
+    name: "deploy-dev"
+    runs-on: [ "self-hosted", "ubuntu-24.04", "develop" ]
+    needs: [ "publish-artifact" ]
+    steps:
+      - name: "Download artifact"
+        uses: "actions/download-artifact@v2"
+        with:
+          name: ${{ env.artifact_name }}
+          path: ./artifact
