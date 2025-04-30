@@ -71,7 +71,7 @@ jobs:
     name: "deploy-prod"
     environment: "prod"
     runs-on: [ "panoramicovphc", "self-hosted", "development" ]
-    needs: [ "deploy-dev" ]
+    needs: [ "publish-artifact" ]
     steps:
       - name: "Download artifact"
         uses: "actions/download-artifact@v4"
