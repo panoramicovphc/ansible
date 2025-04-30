@@ -57,10 +57,20 @@ jobs:
 
   deploy-artifact:
     name: "deploy-dev"
-    runs-on: [ "self-hosted", "development" ]
+    runs-on: [ "panoramicovphc", "self-hosted", "development" ]
     needs: [ "publish-artifact" ]
     steps:
       - name: "Download artifact"
         uses: "actions/download-artifact@v4"
         with:
           name: "${{ env.artifact_name }}"
+
+  confirm-deployment:
+    name: "confirm-deployment"
+    runs-on: ubuntu-24.04
+    needs: [ "deploy-artifact" ]
+    steps:
+      - name: "Wait for manual approval"
+        run: |
+          echo "Waiting for manual approval..."
+          echo "You can approve this step in the Actions tab."
