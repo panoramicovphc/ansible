@@ -91,7 +91,7 @@ jobs:
           sudo tar -xzf "${{ env.artifact_path }}" -C "${ANSIBLE_PROJECT_PATH}"
       - name: "Run ansible-setup.sh"
         run: |
-          chmod +x ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
+          sudo chmod +x ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
           ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
       - name: "Verify Ansible installation"
         run: |
