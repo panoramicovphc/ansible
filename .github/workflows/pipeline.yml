@@ -18,6 +18,8 @@ jobs:
   publish-artifact:
     name: "build-and-publish-artifact"
     runs-on: [ "ubuntu-24.04" ]
+    env:
+      ANSIBLE_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v2"
