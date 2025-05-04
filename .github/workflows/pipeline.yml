@@ -73,12 +73,6 @@ jobs:
         uses: "actions/download-artifact@v4"
         with:
           name: "${{ env.artifact_name }}"
-      - name: "List files in artifact"
-        run: |
-          ls -la
-      - name: "PWD"
-        run: |
-          pwd
       - name: "Delete backup directory"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}_bkp" ]; then
@@ -95,3 +89,18 @@ jobs:
       - name: "Extract artifact"
         run: |
           sudo tar -xzf "${{ env.artifact_path }}" -C "${ANSIBLE_PROJECT_PATH}"
+      - name: "Setup Ansible dependencies"
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_dependencies.yml \
+            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini
+      - name: "Propagate Ansible project"
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/propagate_ansible_project.yml \
+            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini
+      - name: "Setup Ansible runtime"
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_runtime.yml \
+            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini

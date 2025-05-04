@@ -1,2 +1,2 @@
 [prd]
-tankian.mkh    ansible_user=${TANKIAN_USER_LOGIN}    ansible_password=${TANKIAN_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "ansible_controller", "obsidian-livesync", "monica-crm" ]'
+tankian.mkh    ansible_user=${TANKIAN_USER_LOGIN}    ansible_password=${TANKIAN_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "ansible_controller" ]'
