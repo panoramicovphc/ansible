@@ -44,11 +44,9 @@ jobs:
           fi
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: "Resolve artifact name"
-        id: resolve-name
         run: |
           echo "artifact_name=artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz" >> $GITHUB_ENV
       - name: "Resolve artifact path"
-        id: resolve-path
         run: |
           echo "artifact_path=${RUNNER_TEMP}/${{ env.artifact_name }}" >> $GITHUB_ENV
       - name: "Build artifact"
@@ -76,11 +74,9 @@ jobs:
       ENVIRONMENT_STAGE_NAME: "dev"
     steps:
       - name: "Resolve artifact name"
-        id: resolve-name
         run: |
           echo "artifact_name=artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz" >> $GITHUB_ENV
       - name: "Resolve artifact path"
-        id: resolve-path
         run: |
           echo "artifact_path=${GITHUB_WORKSPACE}/${{ env.artifact_name }}" >> $GITHUB_ENV
       - name: "Download artifact"
@@ -88,7 +84,6 @@ jobs:
         with:
           name: "${{ env.artifact_name }}"
       - name: "Create timestamp variable"
-        id: timestamp
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
       - name: "Ensure backup directory exists"
         run: |
@@ -104,8 +99,7 @@ jobs:
       - name: "Ensure project directory exists and is empty"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
-            sudo rm -rf "${ANSIBLE_PROJECT_PATH}"
-          fi
+            sudo rm -rf "${ANSIBLE_PROJECT_PATH}"          fi
           sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
       - name: "Extract artifact"
         run: |
