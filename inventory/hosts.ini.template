@@ -1,2 +1,2 @@
 [dev]
-hostinger-vps    ansible_user=${TANKIAN_USER_LOGIN}    ansible_password=${TANKIAN_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_TANKIAN}    labels='[ "ansible_controller" ]'
+hostinger-vps    ansible_user=${HOSTINGERVPS_USER_LOGIN}    ansible_password=${HOSTINGERVPS_USER_PASSWORD}    CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN_HOSTINGERVPS}    labels='[ "ansible_controller" ]'
