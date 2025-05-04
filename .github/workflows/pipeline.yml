@@ -61,6 +61,31 @@ jobs:
     runs-on: [ "panoramicovphc", "self-hosted", "development" ]
     needs: [ "publish-artifact" ]
     steps:
+      - name: "Run ansible-setup.sh"
+        run: |
+          chmod +x ./ansible-setup.sh
+          ./ansible-setup.sh
+      - name: "Verify Ansible installation"
+        run: |
+          ansible --version
+      - name: "Checkout repository"
+        uses: "actions/checkout@v2"
+      - name: "Install gettext (envsubst)"
+        run: |
+          if command -v apt-get >/dev/null; then
+            sudo apt-get install -y gettext
+          elif command -v yum >/dev/null; then
+            sudo yum install -y gettext
+          elif command -v dnf >/dev/null; then
+            sudo dnf install -y gettext
+          elif command -v pacman >/dev/null; then
+            sudo pacman -Sy --noconfirm gettext
+          elif command -v zypper >/dev/null; then
+            sudo zypper install -y gettext
+          else
+            echo "Unsupported package manager. Please install gettext manually."
+            exit 1
+          fi
       - name: "Resolve artifact name"
         id: resolve-name
         run: |
