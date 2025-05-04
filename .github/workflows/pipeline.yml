@@ -73,6 +73,9 @@ jobs:
         uses: "actions/download-artifact@v4"
         with:
           name: "${{ env.artifact_name }}"
+      - name: "List files in artifact"
+        run: |
+          ls -la
       - name: "Delete backup directory"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}_bkp" ]; then
