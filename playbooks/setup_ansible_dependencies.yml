@@ -46,7 +46,7 @@
         line: "StrictHostKeyChecking no"
         create: yes
         state: present
-      when: ansible_facts['user'] != 'root'
+      when: ansible_user != 'root'
 
     - name: "Ensure SSH authentication works"
       ansible.builtin.command:
