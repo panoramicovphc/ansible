@@ -78,6 +78,9 @@ jobs:
           if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
             mv "${ANSIBLE_PROJECT_PATH}" "${ANSIBLE_PROJECT_PATH}_bkp"
           fi
+      - name: "Ensure permissions for /usr/local"
+        run: |
+          sudo chmod -R u+w /usr/local
       - name: "Ensure project directory exists"
         run: |
           mkdir -p "${ANSIBLE_PROJECT_PATH}"
