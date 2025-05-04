@@ -119,13 +119,16 @@ jobs:
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_dependencies.yml \
             -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini
+            --limit ${{ github.event.inputs.environment }}
       - name: "Propagate Ansible project"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/propagate_ansible_project.yml \
             -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini
+            --limit ${{ github.event.inputs.environment }}
       - name: "Setup Ansible runtime"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_runtime.yml \
             -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini
+            --limit ${{ github.event.inputs.environment }}
