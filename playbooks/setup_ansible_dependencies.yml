@@ -16,11 +16,12 @@
   become: true
 
   tasks:
-    - name: "Ensure SSH, sshpass, and rsync are installed"
+    - name: "Ensure Ansible dependencies"
       ansible.builtin.package:
         name:
           - "openssh-client"
           - "sshpass"
           - "rsync"
+          - "python3"
         state: "present"
       become: true
