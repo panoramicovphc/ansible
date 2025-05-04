@@ -26,9 +26,9 @@ jobs:
         uses: "actions/checkout@v2"
       - name: "Build hosts.ini"
         env:
-          TANKIAN_USER_LOGIN: "${{ vars.TANKIAN_USER_LOGIN }}"
-          TANKIAN_USER_PASSWORD: "${{ secrets.TANKIAN_USER_PASSWORD }}"
-          CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
+          HOSTINGERVPS_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
+          HOSTINGERVPS_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
+          CF_TUNNEL_TOKEN_HOSTINGERVPS: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
         run: |
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: "Resolve artifact name"

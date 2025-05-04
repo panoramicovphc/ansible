@@ -11,14 +11,6 @@
       when: |
         "ansible_controller" in hostvars[inventory_hostname]["labels"]
 
-- name: "Ensure SSH key is copied to the target host"
-  hosts: "all"
-  tasks:
-    - name: "Copy SSH key to the target host"
-      ansible.builtin.command:
-        cmd: "ssh-copy-id -i ~/.ssh/id_rsa.pub vagrant@hostinger-vps"
-      ignore_errors: true
-
 - name: "Playbook to install Ansible dependencies"
   hosts: "label_ansible_controller"
   become: true
