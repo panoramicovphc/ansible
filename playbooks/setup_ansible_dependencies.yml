@@ -40,6 +40,14 @@
       when: |
         setup_distribution.ansible_facts.ansible_distribution == "RedHat" or setup_distribution.ansible_facts.ansible_distribution == "CentOS"
 
+    - name: "Disable strict host key checking for SSH"
+      lineinfile:
+        path: "~/.ssh/config"
+        line: "StrictHostKeyChecking no"
+        create: yes
+        state: present
+      when: ansible_facts['user'] != 'root'
+
     - name: "Ensure SSH authentication works"
       ansible.builtin.command:
         cmd: "ssh -o BatchMode=yes vagrant@hostinger-vps 'echo SSH authentication successful'"
