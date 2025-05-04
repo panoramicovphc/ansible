@@ -76,6 +76,9 @@ jobs:
       - name: "List files in artifact"
         run: |
           ls -la
+      - name: "PWD"
+        run: |
+          pwd
       - name: "Delete backup directory"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}_bkp" ]; then
