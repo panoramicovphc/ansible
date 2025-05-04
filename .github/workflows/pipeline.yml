@@ -99,7 +99,8 @@ jobs:
       - name: "Ensure project directory exists and is empty"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
-            sudo rm -rf "${ANSIBLE_PROJECT_PATH}"          fi
+            sudo rm -rf "${ANSIBLE_PROJECT_PATH}"
+          fi
           sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
       - name: "Extract artifact"
         run: |
