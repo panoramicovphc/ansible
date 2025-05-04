@@ -22,7 +22,7 @@
 
     - name: "Create backup directory if it doesn't exist"
       file:
-        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}_backup"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}_backup"
         state: "directory"
         owner: "root"
         group: "root"
@@ -30,12 +30,12 @@
 
     - name: "Create a zip backup of the Ansible project"
       archive:
-        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
-        dest: "{{ lookup('env', 'ANSIBLE_PROJECT') }}_backup/ansible_backup_{{ timestamp }}.zip"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/"
+        dest: "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}_backup/ansible_backup_{{ timestamp }}.zip"
         format: "zip"
         exclude_path:
-          - "{{ lookup('env', 'ANSIBLE_PROJECT') }}/_dropfolder"
-          - "{{ lookup('env', 'ANSIBLE_PROJECT') }}/.git"
+          - "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/_dropfolder"
+          - "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/.git"
 
 - name: "Clean and propagate Ansible project to remote nodes"
   hosts: "label_ansible_controller"
@@ -44,7 +44,7 @@
   tasks:
     - name: "Ensure destination directory exists"
       file:
-        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/"
         state: "directory"
         owner: "root"
         group: "root"
@@ -53,15 +53,15 @@
     - name: "Clean the destination directory"
       command: |
         rm -rf \
-          {{ lookup('env', 'ANSIBLE_PROJECT') }}/* \
-          {{ lookup('env', 'ANSIBLE_PROJECT') }}/.[!.]* \
-          {{ lookup('env', 'ANSIBLE_PROJECT') }}/..?*
+          {{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/* \
+          {{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/.[!.]* \
+          {{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/..?*
       ignore_errors: true
 
     - name: "Copy Ansible project to remote nodes"
       synchronize:
-        src: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
-        dest: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
+        src: "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/"
+        dest: "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/"
         delete: yes
         recursive: yes
         rsync_opts:
@@ -69,7 +69,7 @@
 
     - name: "Set permissions on Ansible project files"
       file:
-        path: "{{ lookup('env', 'ANSIBLE_PROJECT') }}/"
+        path: "{{ lookup('env', 'ANSIBLE_PROJECT_PATH') }}/"
         state: "directory"
         recurse: yes
         owner: "root"

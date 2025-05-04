@@ -87,18 +87,25 @@ jobs:
         uses: "actions/download-artifact@v4"
         with:
           name: "${{ env.artifact_name }}"
-      - name: "Delete backup directory"
+      - name: "Create timestamp variable"
+        id: timestamp
+        run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+      - name: "Ensure backup directory exists"
         run: |
-          if [ -d "${ANSIBLE_PROJECT_PATH}_bkp" ]; then
-            sudo rm -rf "${ANSIBLE_PROJECT_PATH}_bkp"
+          if [ ! -d "${ANSIBLE_PROJECT_PATH}_backup" ]; then
+            sudo mkdir -p "${ANSIBLE_PROJECT_PATH}_backup"
+            sudo chown $USER:$USER "${ANSIBLE_PROJECT_PATH}_backup"
           fi
-      - name: "Backup current project directory"
+      - name: "Create backup of current project directory"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
-            sudo mv "${ANSIBLE_PROJECT_PATH}" "${ANSIBLE_PROJECT_PATH}_bkp"
+            sudo tar --exclude="${ANSIBLE_PROJECT_PATH}/_dropfolder" --exclude="${ANSIBLE_PROJECT_PATH}/.git" -czf "${ANSIBLE_PROJECT_PATH}_backup/ansible_backup_${{ env.timestamp }}.tar.gz" -C "$(dirname ${ANSIBLE_PROJECT_PATH})" "$(basename ${ANSIBLE_PROJECT_PATH})"
           fi
-      - name: "Ensure project directory exists"
+      - name: "Ensure project directory exists and is empty"
         run: |
+          if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
+            sudo rm -rf "${ANSIBLE_PROJECT_PATH}"
+          fi
           sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
       - name: "Extract artifact"
         run: |
