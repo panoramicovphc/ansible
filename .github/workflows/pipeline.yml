@@ -30,6 +30,18 @@ jobs:
           HOSTINGERVPS_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
           CF_TUNNEL_TOKEN_HOSTINGERVPS: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
         run: |
+          if [ -z "${HOSTINGERVPS_USER_LOGIN}" ]; then
+            echo "Error: HOSTINGERVPS_USER_LOGIN is empty"
+            exit 1
+          fi
+          if [ -z "${HOSTINGERVPS_USER_PASSWORD}" ]; then
+            echo "Error: HOSTINGERVPS_USER_PASSWORD is empty"
+            exit 1
+          fi
+          if [ -z "${CF_TUNNEL_TOKEN_HOSTINGERVPS}" ]; then
+            echo "Error: CF_TUNNEL_TOKEN_HOSTINGERVPS is empty"
+            exit 1
+          fi
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
       - name: "Resolve artifact name"
         id: resolve-name
