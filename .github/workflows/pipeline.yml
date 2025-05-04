@@ -68,7 +68,7 @@ jobs:
       - name: "Resolve artifact path"
         id: resolve-path
         run: |
-          echo "artifact_path=${RUNNER_TEMP}/${{ env.artifact_name }}" >> $GITHUB_ENV
+          echo "artifact_path=${GITHUB_WORKSPACE}/${{ env.artifact_name }}" >> $GITHUB_ENV
       - name: "Download artifact"
         uses: "actions/download-artifact@v4"
         with:
