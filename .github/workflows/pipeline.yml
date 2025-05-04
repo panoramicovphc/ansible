@@ -15,8 +15,6 @@ on:
 
 env:
   ANSIBLE_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
-  ARTIFACT_NAME: "artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz"
-  ARTIFACT_PATH: "${{ runner.temp }}/${{ env.ARTIFACT_NAME }}"
 
 jobs:
 
@@ -36,21 +34,29 @@ jobs:
       - name: "List artifact"
         run: |
           ls -la
+      - name: "Resolve artifact name"
+        id: resolve-name
+        run: |
+          echo "artifact_name=artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz" >> $GITHUB_ENV
+      - name: "Resolve artifact path"
+        id: resolve-path
+        run: |
+          echo "artifact_path=${RUNNER_TEMP}/${{ env.artifact_name }}" >> $GITHUB_ENV
       - name: "Build artifact"
         run: |
-          tar --exclude=".git" --exclude=".github" -czf ${{ env.ARTIFACT_PATH }} .
+          tar --exclude=".git" --exclude=".github" -czf ${{ env.artifact_path }} .
       - name: "Verify artifact"
         run: |
-          if [ ! -f ${{ env.ARTIFACT_PATH }} ]; then
+          if [ ! -f ${{ env.artifact_path }} ]; then
             echo "Artifact was not created successfully."
             exit 1
           fi
       - name: "Upload artifact"
         uses: "actions/upload-artifact@v4"
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: ${{ env.artifact_name }}
           if-no-files-found: error
-          path: ${{ env.ARTIFACT_PATH }}
+          path: ${{ env.artifact_path }}
 
   deploy-dev:
     name: "deploy-dev"
@@ -61,7 +67,7 @@ jobs:
       - name: "Download artifact"
         uses: "actions/download-artifact@v4"
         with:
-          name: "${{ env.ARTIFACT_NAME }}"
+          name: "${{ env.artifact_name }}"
       - name: "Delete backup directory"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}_bkp" ]; then
@@ -77,4 +83,4 @@ jobs:
           sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
       - name: "Extract artifact"
         run: |
-          tar -xzf "${{ env.ARTIFACT_PATH }}" -C "${ANSIBLE_PROJECT_PATH}"
+          tar -xzf "${{ env.artifact_path }}" -C "${ANSIBLE_PROJECT_PATH}"
