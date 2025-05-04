@@ -50,5 +50,5 @@
 
     - name: "Ensure SSH authentication works"
       ansible.builtin.command:
-        cmd: "ssh -o BatchMode=yes vagrant@hostinger-vps 'echo SSH authentication successful'"
+        cmd: "ssh -o BatchMode=yes -o StrictHostKeyChecking=no localhost 'echo SSH authentication successful'"
       ignore_errors: true
