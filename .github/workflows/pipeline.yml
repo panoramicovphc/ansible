@@ -76,16 +76,16 @@ jobs:
       - name: "Delete backup directory"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}_bkp" ]; then
-            rm -rf "${ANSIBLE_PROJECT_PATH}_bkp"
+            sudo rm -rf "${ANSIBLE_PROJECT_PATH}_bkp"
           fi
       - name: "Backup current project directory"
         run: |
           if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
-            mv "${ANSIBLE_PROJECT_PATH}" "${ANSIBLE_PROJECT_PATH}_bkp"
+            sudo mv "${ANSIBLE_PROJECT_PATH}" "${ANSIBLE_PROJECT_PATH}_bkp"
           fi
       - name: "Ensure project directory exists"
         run: |
           sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
       - name: "Extract artifact"
         run: |
-          tar -xzf "${{ env.artifact_path }}" -C "${ANSIBLE_PROJECT_PATH}"
+          sudo tar -xzf "${{ env.artifact_path }}" -C "${ANSIBLE_PROJECT_PATH}"
