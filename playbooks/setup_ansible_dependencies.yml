@@ -16,39 +16,11 @@
   become: true
 
   tasks:
-    - name: "Gather OS distribution information"
-      ansible.builtin.setup:
-        filter: "ansible_distribution"
-      register: "setup_distribution"
-
-    - name: "Install dependencies on Debian-based systems"
-      apt:
-        name: 
+    - name: "Ensure SSH, sshpass, and rsync are installed"
+      ansible.builtin.package:
+        name:
+          - "openssh-client"
           - "sshpass"
           - "rsync"
         state: "present"
-        update_cache: yes
-      when: |
-        setup_distribution.ansible_facts.ansible_distribution == "Debian" or setup_distribution.ansible_facts.ansible_distribution == "Ubuntu"
-
-    - name: "Install dependencies on Red Hat-based systems"
-      yum:
-        name: 
-          - "sshpass"
-          - "rsync"
-        state: "present"
-      when: |
-        setup_distribution.ansible_facts.ansible_distribution == "RedHat" or setup_distribution.ansible_facts.ansible_distribution == "CentOS"
-
-    - name: "Disable strict host key checking for SSH"
-      lineinfile:
-        path: "~/.ssh/config"
-        line: "StrictHostKeyChecking no"
-        create: yes
-        state: present
-      when: ansible_user != 'root'
-
-    - name: "Ensure SSH authentication works"
-      ansible.builtin.command:
-        cmd: "ssh -o BatchMode=yes -o StrictHostKeyChecking=no localhost 'echo SSH authentication successful'"
-      ignore_errors: true
+      become: true
