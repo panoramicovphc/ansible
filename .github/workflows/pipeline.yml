@@ -31,9 +31,6 @@ jobs:
           CF_TUNNEL_TOKEN_TANKIAN: "${{ secrets.CF_TUNNEL_TOKEN_TANKIAN }}"
         run: |
           envsubst < inventory/hosts.ini.template > inventory/hosts.ini
-      - name: "List artifact"
-        run: |
-          ls -la
       - name: "Resolve artifact name"
         id: resolve-name
         run: |
@@ -64,6 +61,14 @@ jobs:
     runs-on: [ "panoramicovphc", "self-hosted", "development" ]
     needs: [ "publish-artifact" ]
     steps:
+      - name: "Resolve artifact name"
+        id: resolve-name
+        run: |
+          echo "artifact_name=artifact-v${{ github.run_number }}.${{ github.run_attempt }}.tar.gz" >> $GITHUB_ENV
+      - name: "Resolve artifact path"
+        id: resolve-path
+        run: |
+          echo "artifact_path=${RUNNER_TEMP}/${{ env.artifact_name }}" >> $GITHUB_ENV
       - name: "Download artifact"
         uses: "actions/download-artifact@v4"
         with:
