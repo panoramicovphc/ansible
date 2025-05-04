@@ -72,6 +72,8 @@ jobs:
     environment: "dev"
     runs-on: [ "panoramicovphc", "self-hosted", "development" ]
     needs: [ "publish-artifact" ]
+    env:
+      ENVIRONMENT_STAGE_NAME: "dev"
     steps:
       - name: "Resolve artifact name"
         id: resolve-name
@@ -131,16 +133,16 @@ jobs:
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_dependencies.yml \
             -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
-            --limit ${{ github.event.inputs.environment }}
+            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
       - name: "Propagate Ansible project"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/propagate_ansible_project.yml \
             -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
-            --limit ${{ github.event.inputs.environment }}
+            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
       - name: "Setup Ansible runtime"
         run: |
           export ANSIBLE_HOST_KEY_CHECKING=False
           ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_runtime.yml \
             -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
-            --limit ${{ github.event.inputs.environment }}
+            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
