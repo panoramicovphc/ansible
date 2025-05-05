@@ -1,0 +1,223 @@
+---
+- name: "Publish project to remote nodes"
+  hosts: "all"
+  become: true
+  any_errors_fatal: true
+  vars:
+    CURRENT_PROJECT_PATH: "{{ CURRENT_PROJECT_PATH }}"
+
+  tasks:
+    - name: "Check if project directory exists"
+      stat:
+        path: "{{ CURRENT_PROJECT_PATH }}"
+      register: "project_dir"
+
+    - name: "Create a timestamp variable"
+      set_fact:
+        timestamp: "{{ lookup('pipe', 'date +%Y%m%d%H%M%S') }}"
+      when: |
+        project_dir.stat.exists
+
+    - name: "Create backup directory if it doesn't exist"
+      file:
+        path: "{{ CURRENT_PROJECT_PATH }}_backup"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+      when: |
+        project_dir.stat.exists
+
+    - name: "Create a zip backup of the project"
+      archive:
+        path: "{{ CURRENT_PROJECT_PATH }}"
+        dest: "{{ CURRENT_PROJECT_PATH }}_backup/{{ timestamp }}.zip"
+        format: "zip"
+      when: |
+        project_dir.stat.exists
+
+- name: "Clean and publish project to remote nodes"
+  hosts: "all"
+  become: true
+  any_errors_fatal: true
+  vars:
+    CURRENT_PROJECT_PATH: "{{ CURRENT_PROJECT_PATH }}"
+
+  tasks:
+    - name: "Ensure destination directory exists"
+      file:
+        path: "{{ CURRENT_PROJECT_PATH }}"
+        state: "directory"
+        owner: "root"
+        group: "root"
+        mode: "0755"
+
+    - name: "Clean the destination directory"
+      command: |
+        rm -rf {{ CURRENT_PROJECT_PATH }}/* {{ CURRENT_PROJECT_PATH }}/.[!.]* {{ CURRENT_PROJECT_PATH }}/..?*
+      ignore_errors: true
+
+    - name: "Copy project to remote nodes"
+      synchronize:
+        src: "{{ DROPFOLDER_PATH }}/"
+        dest: "{{ CURRENT_PROJECT_PATH }}"
+        delete: true
+        recursive: true
+        rsync_opts:
+          - "--chmod=D0755,F0644"
+
+    - name: "Set permissions on project files"
+      file:
+        path: "{{ CURRENT_PROJECT_PATH }}"
+        state: "directory"
+        recurse: true
+        owner: "root"
+        group: "root"
+        mode: "0755"
+
+- name: "Install Docker"
+  hosts: "all"
+  become: true
+  any_errors_fatal: true
+  tasks:
+    - name: "Check if Docker is already installed"
+      command: "docker --version"
+      register: "docker_installed"
+      ignore_errors: true
+
+    - name: "Update package list (Debian/Ubuntu)"
+      apt:
+        update_cache: true
+      when: |
+        ansible_os_family == "Debian" and docker_installed.failed
+
+    - name: "Install required packages (Debian/Ubuntu)"
+      apt:
+        name:
+          - "apt-transport-https"
+          - "ca-certificates"
+          - "curl"
+          - "software-properties-common"
+        state: "present"
+      when: |
+        ansible_os_family == "Debian" and docker_installed.failed
+
+    - name: "Add Docker's official GPG key (Debian/Ubuntu)"
+      apt_key:
+        url: "https://download.docker.com/linux/{{ 'ubuntu' if ansible_distribution == 'Ubuntu' else 'debian' }}/gpg"
+        state: "present"
+      when: |
+        ansible_os_family == "Debian" and docker_installed.failed
+
+    - name: "Add Docker repository (Debian/Ubuntu)"
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/{{ 'ubuntu' if ansible_distribution == 'Ubuntu' else 'debian' }} {{ ansible_distribution_release }} stable"
+        state: "present"
+      when: |
+        ansible_os_family == "Debian" and docker_installed.failed
+
+    - name: "Update package list after adding Docker repository (Debian/Ubuntu)"
+      apt:
+        update_cache: true
+      when: |
+        ansible_os_family == "Debian" and docker_installed.failed
+
+    - name: "Install Docker (Debian/Ubuntu)"
+      apt:
+        name: "docker-ce"
+        state: "present"
+      when: |
+        ansible_os_family == "Debian" and docker_installed.failed
+
+    - name: "Update package list (Fedora)"
+      dnf:
+        update_cache: true
+      when: |
+        ansible_os_family == "RedHat" and docker_installed.failed
+
+    - name: "Install required packages (Fedora)"
+      dnf:
+        name:
+          - "dnf-plugins-core"
+        state: "present"
+      when: |
+        ansible_os_family == "RedHat" and docker_installed.failed
+
+    - name: "Add Docker repository (Fedora)"
+      command: "dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo"
+      when: |
+        ansible_os_family == "RedHat" and docker_installed.failed
+
+    - name: "Install Docker (Fedora)"
+      dnf:
+        name: "docker-ce"
+        state: "present"
+      when: |
+        ansible_os_family == "RedHat" and docker_installed.failed
+
+    - name: "Ensure Docker service is running and enabled"
+      service:
+        name: "docker"
+        state: "started"
+        enabled: "true"
+      when: |
+        docker_installed.failed
+
+    - name: "Add current user to docker group"
+      user:
+        name: "{{ ansible_user }}"
+        groups: "docker"
+        append: "true"
+      when: |
+        docker_installed.failed
+
+- name: "Deploy project"
+  hosts: "all"
+  become: true
+  any_errors_fatal: true
+  vars:
+    CURRENT_PROJECT_PATH: "{{ CURRENT_PROJECT_PATH }}"
+
+  tasks:
+    - name: "Verify CF_TUNNEL_TOKEN is defined for current host"
+      assert:
+        that:
+          - "hostvars[inventory_hostname].CF_TUNNEL_TOKEN is defined"
+        fail_msg: "Variable CF_TUNNEL_TOKEN is not defined for host {{ inventory_hostname }}"
+        success_msg: "Variable CF_TUNNEL_TOKEN is defined for host {{ inventory_hostname }}"
+
+    - name: "Remove existing .env file if it exists"
+      file:
+        path: "{{ CURRENT_PROJECT_PATH }}/docker/.env"
+        state: "absent"
+      when: |
+        hostvars[inventory_hostname].CF_TUNNEL_TOKEN is defined
+
+    - name: "Generate .env file with token"
+      copy:
+        dest: "{{ CURRENT_PROJECT_PATH }}/docker/.env"
+        content: |
+          CF_TUNNEL_TOKEN={{ hostvars[inventory_hostname].CF_TUNNEL_TOKEN | default('') }}
+      when: |
+        hostvars[inventory_hostname].CF_TUNNEL_TOKEN is defined
+
+    - name: "Ensure Docker networks exist"
+      mkh_ensure_docker_network:
+        networks:
+          - name: "panoramicovphc-vpc-net"
+
+    - name: "Pull Docker Compose services"
+      command: |
+        docker compose pull
+      args:
+        chdir: "{{ CURRENT_PROJECT_PATH }}/docker"
+
+    - name: "Start Docker Compose services"
+      command: |
+        docker compose up -d --force-recreate --remove-orphans --build
+      args:
+        chdir: "{{ CURRENT_PROJECT_PATH }}/docker"
+
+    - name: "Prune unused Docker images"
+      command: |
+        docker image prune --force
