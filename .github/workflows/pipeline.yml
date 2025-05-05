@@ -24,7 +24,7 @@ jobs:
       host_user_login: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
     secrets:
       host_user_password: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
-      host_cf_tunnel_token: "${{ secrets.HOST_CF_TUNNEL_TOKENINGERVPS }}"
+      host_cf_tunnel_token: "${{ secrets.HOST_CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
 
   deploy-dev:
     name: "deploy-dev"
