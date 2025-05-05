@@ -58,7 +58,7 @@ jobs:
       - name: "Resolve artifact path"
         id: resolve-artifact-path
         run: |
-          echo "artifact_path=${RUNNER_TEMP}/${{ steps.resolve-artifact-name.outputs.artifact_name }}" >> $GITHUB_ENV
+          echo "artifact_path=${RUNNER_TEMP}/${{ steps.resolve-artifact-name.outputs.artifact_name }}" >> $GITHUB_OUTPUT
       - name: "Build artifact"
         run: |
           tar --exclude=".git" --exclude=".github" -czf ${{ steps.resolve-artifact-path.outputs.artifact_path }} .
