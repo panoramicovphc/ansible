@@ -21,10 +21,10 @@ jobs:
   build-n-publish:
     uses: ./.github/workflows/build-n-publish.yml
     with:
-      host_user_login: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
+      HOST_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
     secrets:
-      host_user_password: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
-      host_cf_tunnel_token: "${{ secrets.HOST_CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
+      HOST_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
+      HOST_CF_TUNNEL_TOKEN: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
 
   deploy-dev:
     name: "deploy-dev"
@@ -33,17 +33,19 @@ jobs:
     needs: [ "build-n-publish" ]
     env:
       ENVIRONMENT_STAGE_NAME: "dev"
+      ARTIFACT_NAME: "${{ needs.build-n-publish.outputs.ARTIFACT_NAME }}"
+      ARTIFACT_PATH: "${{ needs.build-n-publish.outputs.ARTIFACT_PATH }}"
     steps:
       - name: "Resolve artifact name"
         run: |
-          echo "artifact_name=${{ needs.build-n-publish.outputs.artifact_name }}" >> $GITHUB_ENV
+          echo "artifact_name=${{ env.ARTIFACT_NAME }}" >> $GITHUB_ENV
       - name: "Resolve artifact path"
         run: |
-          echo "artifact_path=${GITHUB_WORKSPACE}/${{ needs.build-n-publish.outputs.artifact_name }}" >> $GITHUB_ENV
+          echo "artifact_path=${GITHUB_WORKSPACE}/${{ env.ARTIFACT_NAME }}" >> $GITHUB_ENV
       - name: "Download artifact"
         uses: "actions/download-artifact@v4"
         with:
-          name: "${{ needs.build-n-publish.outputs.artifact_name }}"
+          name: "${{ env.ARTIFACT_NAME }}"
       - name: "Create timestamp variable"
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
       - name: "Ensure backup directory exists"
@@ -65,7 +67,7 @@ jobs:
           sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
       - name: "Extract artifact"
         run: |
-          sudo tar -xzf "${{ needs.build-n-publish.outputs.artifact_path }}" -C "${ANSIBLE_PROJECT_PATH}"
+          sudo tar -xzf "${{ env.ARTIFACT_PATH }}" -C "${ANSIBLE_PROJECT_PATH}"
       - name: "Run ansible-setup.sh"
         run: |
           sudo chmod +x ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
