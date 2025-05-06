@@ -112,7 +112,15 @@ jobs:
             sudo rm -f "${ansible_inventory_path}/hosts.ini"
           fi
           echo "Forging inventory file"
-          sudo envsubst < ${ansible_inventory_path}/hosts.ini.template > ${ansible_inventory_path}/hosts.ini
+          # Create a temp file that the current user can write to
+          temp_hosts_file=$(mktemp)
+          envsubst < ${ansible_inventory_path}/hosts.ini.template > $temp_hosts_file
+          # Move the temp file to the destination with sudo
+          sudo cp $temp_hosts_file ${ansible_inventory_path}/hosts.ini
+          sudo chown $USER:$USER ${ansible_inventory_path}/hosts.ini
+          sudo chmod 644 ${ansible_inventory_path}/hosts.ini
+          # Clean up temp file
+          rm $temp_hosts_file
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
