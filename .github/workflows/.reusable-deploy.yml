@@ -19,6 +19,17 @@ on:
         description: "The path to the Ansible project"
         required: false
         type: "string"
+      HOSTINGERVPS_USER_LOGIN:
+        description: "The login for the Hostingervps user"
+        required: false
+        type: "string"
+    secrets:
+      HOSTINGERVPS_USER_PASSWORD:
+        description: "The password for the Hostingervps user"
+        required: true
+      CF_TUNNEL_TOKEN_HOSTINGERVPS:
+        description: "The Cloudflare tunnel token for Hostingervps"
+        required: true
 
 jobs:
   deploy:
