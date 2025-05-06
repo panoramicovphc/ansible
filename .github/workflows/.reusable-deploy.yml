@@ -15,10 +15,6 @@ on:
         description: "The name of the artifact to deploy"
         required: true
         type: "string"
-      ARTIFACT_PATH:
-        description: "The path where the artifact is stored"
-        required: true
-        type: "string"
       ARTIFACT_PROJECT_PATH:
         description: "The path to the Ansible project"
         required: false
@@ -28,12 +24,12 @@ jobs:
   deploy:
     name: "Reusable Deploy"
     runs-on: [ "panoramicovphc", "self-hosted", "${{ inputs.ENVIRONMENT_RUNNER_LABEL }}" ]
-    environment: ${{ inputs.ENVIRONMENT_STAGE_NAME }}
+    environment: "${{ inputs.ENVIRONMENT_STAGE_NAME }}"
     env:
-      ENVIRONMENT_STAGE_NAME: ${{ inputs.ENVIRONMENT_STAGE_NAME }}
-      ARTIFACT_NAME: ${{ inputs.ARTIFACT_NAME }}
-      ARTIFACT_PATH: ${{ inputs.ARTIFACT_PATH }}
-      ANSIBLE_PROJECT_PATH: ${{ inputs.ARTIFACT_PROJECT_PATH }}
+      ENVIRONMENT_STAGE_NAME: "${{ inputs.ENVIRONMENT_STAGE_NAME }}"
+      ARTIFACT_NAME: "${{ inputs.ARTIFACT_NAME }}"
+      ARTIFACT_PATH: "${{ inputs.ARTIFACT_NAME }}"
+      ANSIBLE_PROJECT_PATH: "${{ github.workspace }}/${{ inputs.ARTIFACT_PROJECT_PATH }}"
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4
@@ -41,7 +37,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: "${{ env.ARTIFACT_NAME }}"
-          path: "${{ env.ARTIFACT_PATH }}"
       - name: "Create timestamp variable"
         id: "create-timestamp"
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
