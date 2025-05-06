@@ -20,7 +20,7 @@ jobs:
 
   build:
     name: "Build"
-    uses: panoramicovphc/reusable-workflows/.reusable-build.yml@main
+    uses: "panoramicovphc/reusable-workflows/.github/workflows/.reusable-build.yml@v1"
     with:
       HOST_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
     secrets:
