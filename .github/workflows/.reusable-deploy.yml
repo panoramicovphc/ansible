@@ -102,7 +102,8 @@ jobs:
             echo "Error: CF_TUNNEL_TOKEN_HOSTINGERVPS is empty"
             exit 1
           fi
-          envsubst < ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini.template > ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini
+          ansible_inventory_path="${ANSIBLE_PROJECT_PATH}/inventory"
+          sudo envsubst < ${ansible_inventory_path}/hosts.ini.template > ${ansible_inventory_path}/hosts.ini
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
