@@ -108,6 +108,7 @@ jobs:
             exit 1
           fi
           if [ -f "${ansible_inventory_path}/hosts.ini" ]; then
+            echo "Deleting hosts.ini found"
             sudo rm -f "${ansible_inventory_path}/hosts.ini"
           fi
           sudo envsubst < ${ansible_inventory_path}/hosts.ini.template > ${ansible_inventory_path}/hosts.ini
