@@ -107,7 +107,9 @@ jobs:
             echo "Error: hosts.ini.template not found"
             exit 1
           fi
-          sudo chmod 644 ${ansible_inventory_path}/hosts.ini
+          if [ -f "${ansible_inventory_path}/hosts.ini" ]; then
+            sudo rm -f "${ansible_inventory_path}/hosts.ini"
+          fi
           sudo envsubst < ${ansible_inventory_path}/hosts.ini.template > ${ansible_inventory_path}/hosts.ini
       - name: "Set up Python"
         uses: actions/setup-python@v5
