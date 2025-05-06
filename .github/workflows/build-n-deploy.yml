@@ -21,11 +21,6 @@ jobs:
   build:
     name: "Build"
     uses: "panoramicovphc/reusable-workflows/.github/workflows/.reusable-build.yml@v1"
-    with:
-      HOST_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
-    secrets:
-      HOST_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
-      HOST_CF_TUNNEL_TOKEN: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
 
   deploy-dev:
     name: "Deploy"
