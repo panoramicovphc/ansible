@@ -28,11 +28,21 @@ jobs:
       HOST_CF_TUNNEL_TOKEN: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
 
   deploy-dev:
-    name: "deploy-dev"
+    name: "Deploy to dev"
     uses: "./.github/workflows/.reusable-deploy.yml"
-    runs-on: [ "panoramicovphc", "self-hosted", "development" ]
     needs: [ "build" ]
     with:
       ENVIRONMENT_STAGE_NAME: "dev"
+      ENVIRONMENT_RUNNER_LABEL: "development"
+      ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
+      ARTIFACT_PATH: "${{ needs.build.outputs.ARTIFACT_PATH }}"
+
+  deploy-prod:
+    name: "Deploy to prod"
+    uses: "./.github/workflows/.reusable-deploy.yml"
+    needs: [ "build" ]
+    with:
+      ENVIRONMENT_STAGE_NAME: "prod"
+      ENVIRONMENT_RUNNER_LABEL: "production"
       ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
       ARTIFACT_PATH: "${{ needs.build.outputs.ARTIFACT_PATH }}"

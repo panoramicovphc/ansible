@@ -7,6 +7,10 @@ on:
         description: "The name of the environment to deploy to (dev, qa, prod, etc.)"
         required: true
         type: "string"
+      ENVIRONMENT_RUNNER_LABEL:
+        description: "The label of the runner to use for the deployment"
+        required: true
+        type: "string"
       ARTIFACT_NAME:
         description: "The name of the artifact to deploy"
         required: true
@@ -23,8 +27,8 @@ on:
 
 jobs:
   deploy:
-    name: "Deploy to ${{ inputs.ENVIRONMENT_STAGE_NAME }}"
-    runs-on: [ "ubuntu-latest" ]
+    name: "Reusable Deploy"
+    runs-on: [ "panoramicovphc", "self-hosted", "${{ inputs.ENVIRONMENT_RUNNER_LABEL }}" ]
     environment: ${{ inputs.ENVIRONMENT_STAGE_NAME }}
     env:
       ENVIRONMENT_STAGE_NAME: ${{ inputs.ENVIRONMENT_STAGE_NAME }}
