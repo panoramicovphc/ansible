@@ -40,17 +40,3 @@ jobs:
     secrets:
       HOSTINGERVPS_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
       CF_TUNNEL_TOKEN_HOSTINGERVPS: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
-
-  deploy-prod:
-    name: "Deploy"
-    uses: "./.github/workflows/.reusable-deploy.yml"
-    needs: [ "build" ]
-    with:
-      ENVIRONMENT_STAGE_NAME: "prod"
-      ENVIRONMENT_RUNNER_LABEL: "production"
-      ARTIFACT_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
-      ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
-      HOSTINGERVPS_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
-    secrets:
-      HOSTINGERVPS_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
-      CF_TUNNEL_TOKEN_HOSTINGERVPS: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
