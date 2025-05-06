@@ -84,9 +84,9 @@ jobs:
             echo "No dependency file found. Creating a default requirements.txt."
             echo "ansible==7.0.0" > "${{ github.workspace }}/requirements.txt"
           fi
-      - name: "Build hosts.ini"
+      - name: "Forge inventory file"
         env:
-          HOSTINGERVPS_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
+          HOSTINGERVPS_USER_LOGIN: "${{ inputs.HOSTINGERVPS_USER_LOGIN }}"
           HOSTINGERVPS_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
           CF_TUNNEL_TOKEN_HOSTINGERVPS: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
         run: |
@@ -102,7 +102,7 @@ jobs:
             echo "Error: CF_TUNNEL_TOKEN_HOSTINGERVPS is empty"
             exit 1
           fi
-          envsubst < inventory/hosts.ini.template > inventory/hosts.ini
+          envsubst < ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini.template > ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
