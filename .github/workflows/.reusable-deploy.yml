@@ -67,6 +67,12 @@ jobs:
       - name: "Verify Ansible installation"
         run: |
           ansible --version
+      - name: Validate or Create Dependency Files
+        run: |
+          if [ ! -f "${{ github.workspace }}/requirements.txt" ] && [ ! -f "${{ github.workspace }}/pyproject.toml" ]; then
+            echo "No dependency file found. Creating a default requirements.txt."
+            echo "ansible==7.0.0" > "${{ github.workspace }}/requirements.txt"
+          fi
       - name: "Set up Python"
         uses: actions/setup-python@v5
         with:
