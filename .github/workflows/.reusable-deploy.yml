@@ -90,6 +90,7 @@ jobs:
           HOSTINGERVPS_USER_PASSWORD: "${{ secrets.HOSTINGERVPS_USER_PASSWORD }}"
           CF_TUNNEL_TOKEN_HOSTINGERVPS: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
         run: |
+          ansible_inventory_path="${ANSIBLE_PROJECT_PATH}/inventory"
           if [ -z "${HOSTINGERVPS_USER_LOGIN}" ]; then
             echo "Error: HOSTINGERVPS_USER_LOGIN is empty"
             exit 1
@@ -102,7 +103,11 @@ jobs:
             echo "Error: CF_TUNNEL_TOKEN_HOSTINGERVPS is empty"
             exit 1
           fi
-          ansible_inventory_path="${ANSIBLE_PROJECT_PATH}/inventory"
+          if [ ! -f "${ansible_inventory_path}/hosts.ini.template" ]; then
+            echo "Error: hosts.ini.template not found"
+            exit 1
+          fi
+          sudo chmod 644 ${ansible_inventory_path}/hosts.ini
           sudo envsubst < ${ansible_inventory_path}/hosts.ini.template > ${ansible_inventory_path}/hosts.ini
       - name: "Set up Python"
         uses: actions/setup-python@v5
