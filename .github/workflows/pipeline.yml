@@ -19,6 +19,7 @@ env:
 jobs:
 
   build-n-publish:
+    name: "Build & Publish"
     uses: ./.github/workflows/build-n-publish.yml
     with:
       HOST_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
