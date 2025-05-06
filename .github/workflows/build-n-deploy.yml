@@ -28,8 +28,8 @@ jobs:
       HOST_CF_TUNNEL_TOKEN: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
 
   deploy-dev:
-    name: "Deploy to dev"
     uses: "./.github/workflows/.reusable-deploy.yml"
+    name: "Deploy to dev"
     needs: [ "build" ]
     with:
       ENVIRONMENT_STAGE_NAME: "dev"
@@ -42,8 +42,8 @@ jobs:
       CF_TUNNEL_TOKEN_HOSTINGERVPS: "${{ secrets.CF_TUNNEL_TOKEN_HOSTINGERVPS }}"
 
   deploy-prod:
-    name: "Deploy to prod"
     uses: "./.github/workflows/.reusable-deploy.yml"
+    name: "Deploy to prod"
     needs: [ "build" ]
     with:
       ENVIRONMENT_STAGE_NAME: "prod"
