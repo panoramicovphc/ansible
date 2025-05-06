@@ -19,11 +19,10 @@ on:
         description: "The path where the artifact is stored"
         required: true
         type: "string"
-      ANSIBLE_PATH:
+      ARTIFACT_PROJECT_PATH:
         description: "The path to the Ansible project"
         required: false
         type: "string"
-        default: "./ansible"
 
 jobs:
   deploy:
@@ -34,7 +33,7 @@ jobs:
       ENVIRONMENT_STAGE_NAME: ${{ inputs.ENVIRONMENT_STAGE_NAME }}
       ARTIFACT_NAME: ${{ inputs.ARTIFACT_NAME }}
       ARTIFACT_PATH: ${{ inputs.ARTIFACT_PATH }}
-      ANSIBLE_PROJECT_PATH: ${{ inputs.ANSIBLE_PATH }}
+      ANSIBLE_PROJECT_PATH: ${{ inputs.ARTIFACT_PROJECT_PATH }}
     steps:
       - name: "Checkout repository"
         uses: actions/checkout@v4

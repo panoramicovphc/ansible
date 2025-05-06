@@ -34,6 +34,7 @@ jobs:
     with:
       ENVIRONMENT_STAGE_NAME: "dev"
       ENVIRONMENT_RUNNER_LABEL: "development"
+      ARTIFACT_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
       ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
       ARTIFACT_PATH: "${{ needs.build.outputs.ARTIFACT_PATH }}"
 
@@ -44,5 +45,6 @@ jobs:
     with:
       ENVIRONMENT_STAGE_NAME: "prod"
       ENVIRONMENT_RUNNER_LABEL: "production"
+      ARTIFACT_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
       ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
       ARTIFACT_PATH: "${{ needs.build.outputs.ARTIFACT_PATH }}"
