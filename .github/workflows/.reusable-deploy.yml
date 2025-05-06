@@ -108,9 +108,10 @@ jobs:
             exit 1
           fi
           if [ -f "${ansible_inventory_path}/hosts.ini" ]; then
-            echo "Deleting hosts.ini found"
+            echo "Deleting hosts.ini file found"
             sudo rm -f "${ansible_inventory_path}/hosts.ini"
           fi
+          echo "Forging inventory file"
           sudo envsubst < ${ansible_inventory_path}/hosts.ini.template > ${ansible_inventory_path}/hosts.ini
       - name: "Set up Python"
         uses: actions/setup-python@v5
