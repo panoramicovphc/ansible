@@ -1,0 +1,93 @@
+name: "Reusable Deploy Workflow"
+
+on:
+  workflow_call:
+    inputs:
+      ENVIRONMENT_STAGE_NAME:
+        description: "The name of the environment to deploy to (dev, qa, prod, etc.)"
+        required: true
+        type: "string"
+      ARTIFACT_NAME:
+        description: "The name of the artifact to deploy"
+        required: true
+        type: "string"
+      ARTIFACT_PATH:
+        description: "The path where the artifact is stored"
+        required: true
+        type: "string"
+      ANSIBLE_PATH:
+        description: "The path to the Ansible project"
+        required: false
+        type: "string"
+        default: "./ansible"
+
+jobs:
+  deploy:
+    name: "Deploy to ${{ inputs.ENVIRONMENT_STAGE_NAME }}"
+    runs-on: [ "ubuntu-latest" ]
+    environment: ${{ inputs.ENVIRONMENT_STAGE_NAME }}
+    env:
+      ENVIRONMENT_STAGE_NAME: ${{ inputs.ENVIRONMENT_STAGE_NAME }}
+      ARTIFACT_NAME: ${{ inputs.ARTIFACT_NAME }}
+      ARTIFACT_PATH: ${{ inputs.ARTIFACT_PATH }}
+      ANSIBLE_PROJECT_PATH: ${{ inputs.ANSIBLE_PATH }}
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      - name: "Download artifact"
+        uses: actions/download-artifact@v4
+        with:
+          name: "${{ env.ARTIFACT_NAME }}"
+      - name: "Create timestamp variable"
+        id: "create-timestamp"
+        run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+      - name: "Ensure backup directory exists"
+        run: |
+          if [ ! -d "${ANSIBLE_PROJECT_PATH}_backup" ]; then
+            sudo mkdir -p "${ANSIBLE_PROJECT_PATH}_backup"
+            sudo chown $USER:$USER "${ANSIBLE_PROJECT_PATH}_backup"
+          fi
+      - name: "Create backup of current project directory"
+        run: |
+          if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
+            sudo tar --exclude="${ANSIBLE_PROJECT_PATH}/_dropfolder" --exclude="${ANSIBLE_PROJECT_PATH}/.git" -czf "${ANSIBLE_PROJECT_PATH}_backup/ansible_backup_${{ steps.create-timestamp.outputs.timestamp }}.tar.gz" -C "$(dirname ${ANSIBLE_PROJECT_PATH})" "$(basename ${ANSIBLE_PROJECT_PATH})"
+          fi
+      - name: "Ensure project directory exists and is empty"
+        run: |
+          if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
+            sudo rm -rf "${ANSIBLE_PROJECT_PATH}"
+          fi
+          sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
+      - name: "Extract artifact"
+        run: |
+          sudo tar -xzf "${{ env.ARTIFACT_PATH }}" -C "${ANSIBLE_PROJECT_PATH}"
+      - name: "Run ansible-setup.sh"
+        run: |
+          sudo chmod +x ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
+          ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
+      - name: "Verify Ansible installation"
+        run: |
+          ansible --version
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: "Setup Ansible dependencies"
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_dependencies.yml \
+            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
+            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
+      - name: "Propagate Ansible project"
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/propagate_ansible_project.yml \
+            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
+            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
+      - name: "Setup Ansible runtime"
+        run: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_runtime.yml \
+            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
+            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}

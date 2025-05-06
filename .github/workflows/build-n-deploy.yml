@@ -29,86 +29,10 @@ jobs:
 
   deploy-dev:
     name: "deploy-dev"
-    environment: "dev"
+    uses: "./.github/workflows/.reusable-deploy.yml"
     runs-on: [ "panoramicovphc", "self-hosted", "development" ]
     needs: [ "build" ]
-    env:
+    with:
       ENVIRONMENT_STAGE_NAME: "dev"
       ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
       ARTIFACT_PATH: "${{ needs.build.outputs.ARTIFACT_PATH }}"
-    steps:
-      - name: "Resolve artifact name"
-        run: |
-          echo "artifact_name=${{ env.ARTIFACT_NAME }}" >> $GITHUB_ENV
-      - name: "Resolve artifact path"
-        run: |
-          echo "artifact_path=${GITHUB_WORKSPACE}/${{ env.ARTIFACT_NAME }}" >> $GITHUB_ENV
-      - name: "Download artifact"
-        uses: "actions/download-artifact@v4"
-        with:
-          name: "${{ env.ARTIFACT_NAME }}"
-      - name: "Create timestamp variable"
-        run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
-      - name: "Ensure backup directory exists"
-        run: |
-          if [ ! -d "${ANSIBLE_PROJECT_PATH}_backup" ]; then
-            sudo mkdir -p "${ANSIBLE_PROJECT_PATH}_backup"
-            sudo chown $USER:$USER "${ANSIBLE_PROJECT_PATH}_backup"
-          fi
-      - name: "Create backup of current project directory"
-        run: |
-          if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
-            sudo tar --exclude="${ANSIBLE_PROJECT_PATH}/_dropfolder" --exclude="${ANSIBLE_PROJECT_PATH}/.git" -czf "${ANSIBLE_PROJECT_PATH}_backup/ansible_backup_${{ env.timestamp }}.tar.gz" -C "$(dirname ${ANSIBLE_PROJECT_PATH})" "$(basename ${ANSIBLE_PROJECT_PATH})"
-          fi
-      - name: "Ensure project directory exists and is empty"
-        run: |
-          if [ -d "${ANSIBLE_PROJECT_PATH}" ]; then
-            sudo rm -rf "${ANSIBLE_PROJECT_PATH}"
-          fi
-          sudo mkdir -p "${ANSIBLE_PROJECT_PATH}"
-      - name: "Extract artifact"
-        run: |
-          sudo tar -xzf "${{ env.ARTIFACT_PATH }}" -C "${ANSIBLE_PROJECT_PATH}"
-      - name: "Run ansible-setup.sh"
-        run: |
-          sudo chmod +x ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
-          ${ANSIBLE_PROJECT_PATH}/ansible-setup.sh
-      - name: "Verify Ansible installation"
-        run: |
-          ansible --version
-      - name: "Checkout repository"
-        uses: "actions/checkout@v2"
-      - name: "Install gettext (envsubst)"
-        run: |
-          if command -v apt-get >/dev/null; then
-            sudo apt-get install -y gettext
-          elif command -v yum >/dev/null; then
-            sudo yum install -y gettext
-          elif command -v dnf >/dev/null; then
-            sudo dnf install -y gettext
-          elif command -v pacman >/dev/null; then
-            sudo pacman -Sy --noconfirm gettext
-          elif command -v zypper >/dev/null; then
-            sudo zypper install -y gettext
-          else
-            echo "Unsupported package manager. Please install gettext manually."
-            exit 1
-          fi
-      - name: "Setup Ansible dependencies"
-        run: |
-          export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_dependencies.yml \
-            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
-            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
-      - name: "Propagate Ansible project"
-        run: |
-          export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/propagate_ansible_project.yml \
-            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
-            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
-      - name: "Setup Ansible runtime"
-        run: |
-          export ANSIBLE_HOST_KEY_CHECKING=False
-          ansible-playbook ${ANSIBLE_PROJECT_PATH}/playbooks/setup_ansible_runtime.yml \
-            -i ${ANSIBLE_PROJECT_PATH}/inventory/hosts.ini \
-            --limit ${{ env.ENVIRONMENT_STAGE_NAME }}
