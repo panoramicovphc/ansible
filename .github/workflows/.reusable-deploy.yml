@@ -1,4 +1,4 @@
-name: "Reusable Deploy Workflow"
+name: ".reusable-deploy"
 
 on:
   workflow_call:
@@ -41,6 +41,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: "${{ env.ARTIFACT_NAME }}"
+          path: "${{ env.ARTIFACT_PATH }}"
       - name: "Create timestamp variable"
         id: "create-timestamp"
         run: echo "timestamp=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
