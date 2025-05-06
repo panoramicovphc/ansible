@@ -33,7 +33,7 @@ on:
 
 jobs:
   deploy:
-    name: "Reusable Deploy"
+    name: "Deploy to ${{ inputs.ENVIRONMENT_STAGE_NAME }}"
     runs-on: [ "panoramicovphc", "self-hosted", "${{ inputs.ENVIRONMENT_RUNNER_LABEL }}" ]
     environment: "${{ inputs.ENVIRONMENT_STAGE_NAME }}"
     env:
