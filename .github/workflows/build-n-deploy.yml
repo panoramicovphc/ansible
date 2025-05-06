@@ -1,4 +1,4 @@
-name: "pipeline"
+name: "Build & Deploy"
 run-name: "${{ github.event_name }} by ${{ github.actor }} #${{ github.run_number }}.${{ github.run_attempt }}"
 
 on:
@@ -18,9 +18,9 @@ env:
 
 jobs:
 
-  build-n-publish:
-    name: "Build & Publish"
-    uses: ./.github/workflows/build-n-publish.yml
+  build:
+    name: "Build"
+    uses: ./.github/workflows/reusable-build.yml
     with:
       HOST_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
     secrets:
@@ -31,11 +31,11 @@ jobs:
     name: "deploy-dev"
     environment: "dev"
     runs-on: [ "panoramicovphc", "self-hosted", "development" ]
-    needs: [ "build-n-publish" ]
+    needs: [ "build" ]
     env:
       ENVIRONMENT_STAGE_NAME: "dev"
-      ARTIFACT_NAME: "${{ needs.build-n-publish.outputs.ARTIFACT_NAME }}"
-      ARTIFACT_PATH: "${{ needs.build-n-publish.outputs.ARTIFACT_PATH }}"
+      ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
+      ARTIFACT_PATH: "${{ needs.build.outputs.ARTIFACT_PATH }}"
     steps:
       - name: "Resolve artifact name"
         run: |
