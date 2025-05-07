@@ -9,6 +9,7 @@ Os playbooks neste repositório são projetados para:
 - Configurar o ambiente de execução do Ansible.
 - Instalar as dependências necessárias para o Ansible.
 - Propagar o projeto Ansible para os nós remotos.
+- Implantar projetos Docker em nós remotos.
 
 ## Playbooks
 
@@ -34,6 +35,16 @@ Este playbook propaga o projeto Ansible para os nós remotos, realizando as segu
 - Copiando os arquivos do projeto para os nós remotos.
 - Definindo permissões apropriadas.
 
+### deploy-docker.yml
+
+Este playbook realiza a implantação de projetos Docker nos nós remotos, incluindo:
+
+- Backup do projeto atual.
+- Limpeza do diretório de destino.
+- Configuração e inicialização de serviços Docker Compose.
+- Instalação do Docker, caso necessário.
+- Configuração de redes e volumes Docker.
+
 ## Inventário
 
 O arquivo `inventory/hosts.ini` contém a configuração de inventário para os playbooks Ansible. Ele usa variáveis de ambiente para informações sensíveis.
@@ -53,7 +64,7 @@ host3    ansible_user=${HOST3_USER_LOGIN}    ansible_password=${HOST3_USER_PASSW
 
 ## Fluxo de Trabalho do GitHub Actions
 
-O arquivo `.github/workflows/main.yml` contém um fluxo de trabalho do GitHub Actions para automatizar a implantação do projeto Ansible. Inclui etapas para configurar os ambientes de execução, instalar dependências e propagar o projeto.
+O arquivo `.github/workflows/build-n-deploy.yml` contém um fluxo de trabalho do GitHub Actions para automatizar a construção e implantação do projeto Ansible. Inclui etapas para configurar os ambientes de execução, instalar dependências, propagar o projeto e implantar serviços Docker.
 
 ## Uso
 
@@ -78,6 +89,7 @@ O arquivo `.github/workflows/main.yml` contém um fluxo de trabalho do GitHub Ac
     ansible-playbook -i inventory/hosts.ini playbooks/setup_ansible_runtime.yml
     ansible-playbook -i inventory/hosts.ini playbooks/setup_ansible_dependencies.yml
     ansible-playbook -i inventory/hosts.ini playbooks/propagate_ansible_project.yml
+    ansible-playbook -i inventory/hosts.ini playbooks/deploy-docker.yml
     ```
 
 ## Contribuindo
