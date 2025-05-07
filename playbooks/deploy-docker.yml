@@ -186,18 +186,13 @@
         fail_msg: "Variable CF_TUNNEL_TOKEN is not defined for host {{ inventory_hostname }}"
         success_msg: "Variable CF_TUNNEL_TOKEN is defined for host {{ inventory_hostname }}"
 
-    - name: "Remove existing .env file if it exists"
-      file:
-        path: "{{ CURRENT_PROJECT_PATH }}/docker/.env"
-        state: "absent"
-      when: |
-        hostvars[inventory_hostname].CF_TUNNEL_TOKEN is defined
-
-    - name: "Generate .env file with token"
-      copy:
-        dest: "{{ CURRENT_PROJECT_PATH }}/docker/.env"
-        content: |
-          CF_TUNNEL_TOKEN={{ hostvars[inventory_hostname].CF_TUNNEL_TOKEN | default('') }}
+    - name: "Forge .env file"
+      environment:
+        CF_TUNNEL_TOKEN: "{{ hostvars[inventory_hostname].CF_TUNNEL_TOKEN }}"
+      shell: |
+        envsubst < .env.template > .env
+      args:
+        chdir: "{{ CURRENT_PROJECT_PATH }}/docker"
       when: |
         hostvars[inventory_hostname].CF_TUNNEL_TOKEN is defined
 

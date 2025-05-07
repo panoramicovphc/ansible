@@ -15,7 +15,7 @@ on:
         description: "The name of the artifact to deploy"
         required: true
         type: "string"
-      ARTIFACT_PROJECT_PATH:
+      CURRENT_PROJECT_PATH:
         description: "The path to the Ansible project"
         required: false
         type: "string"
@@ -40,10 +40,8 @@ jobs:
       ENVIRONMENT_STAGE_NAME: "${{ inputs.ENVIRONMENT_STAGE_NAME }}"
       ARTIFACT_NAME: "${{ inputs.ARTIFACT_NAME }}"
       ARTIFACT_PATH: "${{ github.workspace }}/${{ inputs.ARTIFACT_NAME }}"
-      ANSIBLE_PROJECT_PATH: "${{ inputs.ARTIFACT_PROJECT_PATH }}"
+      ANSIBLE_PROJECT_PATH: "${{ inputs.CURRENT_PROJECT_PATH }}"
     steps:
-      - name: "Checkout repository"
-        uses: actions/checkout@v4
       - name: "Download artifact"
         uses: actions/download-artifact@v4
         with:

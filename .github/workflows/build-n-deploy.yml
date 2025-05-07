@@ -29,7 +29,7 @@ jobs:
     with:
       ENVIRONMENT_STAGE_NAME: "dev"
       ENVIRONMENT_RUNNER_LABEL: "development"
-      ARTIFACT_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
+      CURRENT_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
       ARTIFACT_NAME: "${{ needs.build.outputs.ARTIFACT_NAME }}"
       HOSTINGERVPS_USER_LOGIN: "${{ vars.HOSTINGERVPS_USER_LOGIN }}"
     secrets:
