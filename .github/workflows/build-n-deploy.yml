@@ -13,9 +13,6 @@ on:
         required: true
         default: "Manual trigger"
 
-env:
-  ANSIBLE_PROJECT_PATH: "${{ vars.ANSIBLE_PROJECT_PATH }}"
-
 jobs:
 
   build:
